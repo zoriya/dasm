@@ -61,6 +61,12 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned raw)
 		case IMM16:
 			printf("%02x%02x", raw & 0xFF, (raw & 0xFF00) >> 8);
 			break;
+		case REL8:
+			printf("%02x", addr + inst.size - (raw & 0xFF));
+			break;
+		case REL16:
+			printf("%04x", addr + inst.size - ((raw & 0xFF << 8) + (raw & 0xFF00 >> 8)));
+			break;
 		case REG8:
 			printf("%s", registers8[operand & 0b111000 >> 3]);
 			break;

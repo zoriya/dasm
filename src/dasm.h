@@ -27,6 +27,10 @@ typedef enum addressing_mode {
 	IMM8,
 	// 16bit immediate data
 	IMM16,
+	// Like IMM8 but for relative jumps
+	REL8,
+	// Like IMM16 but for relative jumps
+	REL16,
 	// Special item just to mark the end
 	END,
 } addressing_mode_t;
