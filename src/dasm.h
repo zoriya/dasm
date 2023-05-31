@@ -15,10 +15,14 @@ int dasm(u_int8_t *binary, unsigned long size);
 // } addressing_mode_t;
 
 typedef enum addressing_mode {
-	// Register or 8bit of memory
-	R_M8,
 	// 8bit register
 	REG8,
+	// 16bit register
+	REG16,
+	// Register or 8bit of memory
+	R_M8,
+	// Register or 16bit of memory
+	R_M16,
 	// 8bit immediate data
 	IMM8,
 	// 16bit immediate data
