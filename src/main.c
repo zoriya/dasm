@@ -44,6 +44,11 @@ int main(int argc, char **argv)
 		puts("Could not read binary file.");
 		return 2;
 	}
+	// Smaller than the header size.
+	if (size < 32) {
+		puts("Binary too small.");
+		return 2;
+	}
 
 	int ret = dasm(binary, size);
 	free(binary);
