@@ -14,12 +14,33 @@ void print_rm_operand(instruction_t inst, unsigned raw, u_int8_t operand, bool i
 	(void)raw;
 	unsigned mod = operand << 6;
 	unsigned rm = operand & 0b111;
+	char disp[20] = {0};
+
 	if (mod == 0b11) {
 		printf("%s", is16bit ? registers16[rm] : registers8[rm]);
 		return;
 	}
-	printf("undefined");
-	// TODO: Understand and implement other modes here
+
+	if (mod == 0b10 || (mod == 0 && rm == 0b110)) {
+		// TODO: Understand how to retrieve disp low and high
+		snprintf(disp, sizeof(disp), "+%02x", 0);
+	}
+	if (mod == 0b01) {
+		// TODO: Understand how to retrieve disp low and high
+		// TODO: Here, the disp is signed.
+	}
+
+	switch (rm)
+	{
+		case 0x00: printf("[bx+si%s]", disp); break;
+		case 0x01: printf("[bx+di%s]", disp); break;
+		case 0x02: printf("[bp+si%s]", disp); break;
+		case 0x03: printf("[bp+di%s]", disp); break;
+		case 0x04: printf("[si%s]", disp); break;
+		case 0x05: printf("[di%s]", disp); break;
+		case 0x06: printf("[bp%s]", disp); break;
+		case 0x07: printf("[bx%s]", disp); break;
+	}
 }
 
 void print_instruction(unsigned addr, instruction_t inst, unsigned raw)
