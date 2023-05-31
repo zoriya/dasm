@@ -3,12 +3,14 @@
 #include <stdbool.h>
 #include "dasm.h"
 
-const char *registers8[] = { "AL", "CL", "DL", "BL", "AH", "CH", "DH", "BH" };
-const char *registers16[] = { "AX", "CX", "DX", "BX", "SP", "BP", "SI", "DI" };
+const char *registers8[] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
+const char *registers16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 
 
 void print_rm_operand(instruction_t inst, unsigned raw, u_int8_t operand, bool is16bit)
 {
+	(void)inst;
+	(void)raw;
 	unsigned mod = operand << 6;
 	unsigned rm = operand & 0b111;
 	if (mod == 0b11) {
@@ -21,7 +23,7 @@ void print_rm_operand(instruction_t inst, unsigned raw, u_int8_t operand, bool i
 void print_instruction(unsigned addr, instruction_t inst, unsigned raw)
 {
 	u_int8_t operand = raw & (0xFF << (inst.size - 2));
-	printf("%04x: %-13x %s", addr, raw, inst.name);
+	printf("%04x: %0*x%-*s %s", addr, inst.size * 2, raw, 13 - inst.size * 2, "", inst.name);
 	for (int i = 0; inst.mode[i] != END; i++) {
 		switch (inst.mode[i]) {
 		case IMM8:
@@ -76,13 +78,15 @@ int dasm(u_int8_t *binary, unsigned long size)
 	unsigned long pc = 0;
 	int header_size = 0;
 
-	if (binary[0] == 0xEB && binary[1] == 0x0E)
+	if (binary[0] == 0xEB && binary[1] == 0x0E) {
 		header_size = 16;
-	else if (binary[0] == 0x01 && binary[1] == 0x03)
+		size = binary[2] | (binary[3] << 8);
+	} else if (binary[0] == 0x01 && binary[1] == 0x03) {
 		header_size = binary[4];
+		size = binary[8]  | (binary[9] << 8)  | (binary[10] << 16) | (binary[11] << 24);
+	}
 
 	binary += header_size;
-	size -= header_size;
 
 	while (pc < size) {
 		instruction_t inst = parse_inst(binary);
