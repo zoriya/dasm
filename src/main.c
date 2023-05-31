@@ -2,33 +2,33 @@
 #include <string.h>
 #include <stdlib.h>
 #include "dasm.h"
+#include "sys/types.h"
 
-char *open_and_read(char *path)
+unsigned long open_and_read(char *path, u_int8_t **out)
 {
+	*out = NULL;
 	FILE *file = fopen(path, "r");
 	if (!file) {
 		dprintf(2, "Invalid path: %s. File does not exist.\n", path);
-		return NULL;
+		return 0;
 	}
 
 	int rc = fseek(file, 0L, SEEK_END);
 	if (rc != 0) {
 		fclose(file);
-		return NULL;
+		return 0;
 	}
 	long size = ftell(file);
 	if (size == -1) {
 		fclose(file);
-		return NULL;
+		return 0;
 	}
 	rewind(file);
 
-	char *ret = malloc((size + 1) * sizeof(char));
-	size = fread(ret, sizeof(char), size, file);
-	ret[size] = '\0';
-
+	*out = malloc(size * sizeof(u_int8_t));
+	size = fread(*out, sizeof(u_int8_t), size, file);
 	fclose(file);
-	return ret;
+	return size;
 }
 
 int main(int argc, char **argv)
@@ -38,13 +38,14 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-	char *binary = open_and_read(argv[2]);
+	u_int8_t *binary;
+	unsigned long size = open_and_read(argv[2], &binary);
 	if (!binary) {
 		puts("Could not read binary file.");
 		return 2;
 	}
 
-	int ret = dasm(binary);
+	int ret = dasm(binary, size);
 	free(binary);
 	return ret;
 }

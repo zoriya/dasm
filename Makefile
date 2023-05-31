@@ -1,9 +1,10 @@
 NAME = dasm
 CFLAGS = -Wall -Wextra -Wshadow
-LDFLAGS = 
+LDFLAGS =
 
 SRC = src/main.c \
-	  src/dasm.c
+	  src/dasm.c \
+	  src/instructions.c
 
 OBJ = $(SRC:%.c=%.o)
 
