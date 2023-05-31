@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 #include "dasm.h"
 
 const char *registers8[] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
@@ -14,29 +15,36 @@ void print_rm_operand(instruction_t inst, unsigned raw, u_int8_t operand, bool i
 	unsigned mod = operand << 6;
 	unsigned rm = operand & 0b111;
 	if (mod == 0b11) {
-		printf(", %s", is16bit ? registers16[rm] : registers8[rm]);
+		printf("%s", is16bit ? registers16[rm] : registers8[rm]);
 		return;
 	}
+	printf("undefined");
 	// TODO: Understand and implement other modes here
 }
 
 void print_instruction(unsigned addr, instruction_t inst, unsigned raw)
 {
+	bool need_comma = strchr(inst.name, ' ');
 	u_int8_t operand = raw & (0xFF << (inst.size - 2));
 	printf("%04x: %0*x%-*s %s", addr, inst.size * 2, raw, 13 - inst.size * 2, "", inst.name);
 	for (int i = 0; inst.mode[i] != END; i++) {
+		if (need_comma)
+			printf(", ");
+		else
+			printf(" ");
+		need_comma = true;
 		switch (inst.mode[i]) {
 		case IMM8:
-			printf(", %02x", raw & 0xFF);
+			printf("%02x", raw & 0xFF);
 			break;
 		case IMM16:
-			printf(", %02x%02x", raw & 0xFF, (raw & 0xFF00) >> 8);
+			printf("%02x%02x", raw & 0xFF, (raw & 0xFF00) >> 8);
 			break;
 		case REG8:
-			printf(", %s", registers8[operand & 0b111000 >> 3]);
+			printf("%s", registers8[operand & 0b111000 >> 3]);
 			break;
 		case REG16:
-			printf(", %s", registers16[operand & 0b111000 >> 3]);
+			printf("%s", registers16[operand & 0b111000 >> 3]);
 			break;
 		case R_M8:
 			print_rm_operand(inst, raw, operand, false);

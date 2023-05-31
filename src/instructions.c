@@ -17,6 +17,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x0C, .name = "or al", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0x0D, .name = "or ax", .mode = {IMM16, END}, .size = 3},
 	{.opcode = 0x0E, .name = "push cs", .mode = {END}, .size = 1},
+
 	{.opcode = 0x10, .name = "adc", .mode = {R_M8, REG8, END}, .size = 2},
 	{.opcode = 0x11, .name = "adc", .mode = {R_M16, REG16, END}, .size = 3},
 	{.opcode = 0x12, .name = "adc", .mode = {REG8, R_M8, END}, .size = 2},
@@ -39,6 +40,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x23, .name = "and", .mode = {REG16, R_M16, END}, .size = 3},
 	{.opcode = 0x24, .name = "and al", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0x25, .name = "and ax", .mode = {IMM16, END}, .size = 3},
+
 	{.opcode = 0xB0, .name = "mov al", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0xB1, .name = "mov cl", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0xB2, .name = "mov dl", .mode = {IMM8, END}, .size = 2},
@@ -55,6 +57,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0xBD, .name = "mov bp", .mode = {IMM16, END}, .size = 3},
 	{.opcode = 0xBE, .name = "mov si", .mode = {IMM16, END}, .size = 3},
 	{.opcode = 0xBF, .name = "mov di", .mode = {IMM16, END}, .size = 3},
+
 	{.opcode = 0xCC, .name = "int3", .mode = {END}, .size = 1},
 	{.opcode = 0xCD, .name = "int", .mode = {IMM8, END}, .size = 2},
 	{.name = NULL}
