@@ -12,7 +12,7 @@ void print_rm_operand(instruction_t inst, unsigned raw, u_int8_t operand, bool i
 {
 	(void)inst;
 	(void)raw;
-	unsigned mod = operand << 6;
+	unsigned mod = operand >> 6;
 	unsigned rm = operand & 0b111;
 	char disp[20] = {0};
 
