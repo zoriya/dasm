@@ -73,10 +73,17 @@ bool has_reg(instruction_t inst)
 
 void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary)
 {
-	bool need_comma = strchr(inst.name, ' ');
+	char *last_param = strchr(inst.name, '%');
+	// if the instruction has already a param in it (ex `in al`), we need to directly add a comma.
+	// `jmp short` is an exception as it is the only instruction with a space in it that is not a parameter.
+	bool need_comma = !last_param && strchr(inst.name, ' ') && inst.opcode != 0xEB;
 	int imm_idx = 1 + (inst.extended != -1 || has_reg(inst));
 
-	printf("%04x: %0*x%-*s %s", addr, inst_size * 2, read_size(binary, inst_size), 13 - inst_size * 2, "", inst.name);
+	printf("%04x: %0*x%-*s", addr, inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
+	if (last_param)
+		printf("%.*s", (int)(last_param - inst.name - 1), inst.name);
+	else
+		printf("%s", inst.name);
 
 	for (int i = 0; inst.mode[i] != END; i++) {
 		if (need_comma)
@@ -115,6 +122,8 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 			break;
 		}
 	}
+	if (last_param)
+		printf("%s", last_param + 2);
 	printf("\n");
 }
 
@@ -178,7 +187,7 @@ unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size)
 
 int dasm(u_int8_t *binary, unsigned long size)
 {
-	unsigned long pc = 0;
+	unsigned pc = 0;
 	int header_size = 0;
 
 	if (binary[0] == 0xEB && binary[1] == 0x0E) {
@@ -195,8 +204,8 @@ int dasm(u_int8_t *binary, unsigned long size)
 		instruction_t inst = parse_inst(binary, size - pc);
 		unsigned inst_size = get_inst_size(inst, binary, size - pc);
 		if (pc + inst_size > size) {
-			printf("Invalid file. Missing operand for instruction: '%s'. (pc: %lx)\n", inst.name, pc);
-			return 1;
+			printf("%04x: %02x            (undefined)\n", pc, inst.opcode);
+			return 0;
 		}
 		print_instruction(pc, inst, inst_size, binary);
 		pc += inst_size;
