@@ -101,7 +101,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x70, .extended = -1, .name = "jo", .mode = {REL8, END}},
 	{.opcode = 0x71, .extended = -1, .name = "jno", .mode = {REL8, END}},
 	{.opcode = 0x72, .extended = -1, .name = "jc", .mode = {REL8, END}},
-	{.opcode = 0x73, .extended = -1, .name = "jnc", .mode = {REL8, END}},
+	{.opcode = 0x73, .extended = -1, .name = "jnb", .mode = {REL8, END}},
 	{.opcode = 0x74, .extended = -1, .name = "jz", .mode = {REL8, END}},
 	{.opcode = 0x75, .extended = -1, .name = "jnz", .mode = {REL8, END}},
 	{.opcode = 0x76, .extended = -1, .name = "jna", .mode = {REL8, END}},

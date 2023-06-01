@@ -73,10 +73,10 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 			printf("%04x", (binary[inst_size - 1] << 8) | binary[inst_size - 2]);
 			break;
 		case REL8:
-			printf("%02x", addr + inst_size - binary[inst_size - 1]);
+			printf("%04x", addr + inst_size + (int8_t)binary[inst_size - 1]);
 			break;
 		case REL16:
-			printf("%04x", addr + inst_size - ((binary[inst_size - 1] << 8) | binary[inst_size - 2]));
+			printf("%04x", addr + inst_size + (int16_t)((binary[inst_size - 1] << 8) | binary[inst_size - 2]));
 			break;
 		case REG8:
 			printf("%s", registers8[(binary[1] & 0b111000) >> 3]);
@@ -108,7 +108,7 @@ instruction_t parse_inst(u_int8_t *binary, unsigned long size)
 
 		if (size < 2)
 			return invalid_instruction;
-		unsigned mod = binary[1] & 0b111000 >> 3;
+		unsigned mod = (binary[1] & 0b111000) >> 3;
 		return extended[instructions[i].extended][mod];
 	}
 	return invalid_instruction;
