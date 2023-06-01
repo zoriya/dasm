@@ -40,7 +40,7 @@ typedef struct instruction {
 	const char *name;
 	unsigned size;
 	addressing_mode_t mode[5];
-	unsigned extended;
+	int extended;
 } instruction_t;
 
 extern const instruction_t instructions[];

@@ -102,8 +102,12 @@ instruction_t parse_inst(u_int8_t *binary, unsigned long size)
 	for (int i = 0; instructions[i].name; i++) {
 		if (instructions[i].opcode != *binary)
 			continue;
+
 		if (instructions[i].extended == -1)
 			return instructions[i];
+
+		if (size < 2)
+			return invalid_instruction;
 		unsigned mod = binary[1] & 0b111000 >> 3;
 		return extended[instructions[i].extended][mod];
 	}
@@ -126,7 +130,7 @@ int dasm(u_int8_t *binary, unsigned long size)
 	binary += header_size;
 
 	while (pc < size) {
-		instruction_t inst = parse_inst(binary);
+		instruction_t inst = parse_inst(binary, size - pc);
 		if (pc + inst.size > size) {
 			printf("Invalid file. Missing operand for instruction: '%s'. (pc: %lx)\n", inst.name, pc);
 			return 1;
