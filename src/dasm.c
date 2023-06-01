@@ -68,10 +68,10 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned raw)
 			printf("%04x", addr + inst.size - ((raw & 0xFF << 8) + (raw & 0xFF00 >> 8)));
 			break;
 		case REG8:
-			printf("%s", registers8[operand & 0b111000 >> 3]);
+			printf("%s", registers8[(operand & 0b111000) >> 3]);
 			break;
 		case REG16:
-			printf("%s", registers16[operand & 0b111000 >> 3]);
+			printf("%s", registers16[(operand & 0b111000) >> 3]);
 			break;
 		case R_M8:
 			print_rm_operand(inst, raw, operand, false);

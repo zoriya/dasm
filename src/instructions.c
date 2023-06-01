@@ -122,7 +122,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x86, .extended = -1, .name = "xchg", .mode = {R_M8, REG8, END}, .size = 2},
 	{.opcode = 0x87, .extended = -1, .name = "xchg", .mode = {R_M16, REG16, END}, .size = 3},
 	{.opcode = 0x88, .extended = -1, .name = "mov", .mode = {R_M8, REG8, END}, .size = 2},
-	{.opcode = 0x89, .extended = -1, .name = "mov", .mode = {R_M16, REG16, END}, .size = 3},
+	{.opcode = 0x89, .extended = -1, .name = "mov", .mode = {R_M16, REG16, END}, .size = 2},
 	{.opcode = 0x8A, .extended = -1, .name = "mov", .mode = {REG8, R_M8, END}, .size = 2},
 	{.opcode = 0x8B, .extended = -1, .name = "mov", .mode = {REG16, R_M16, END}, .size = 3},
 	// {.opcode = 0x8C, .extended = -1, .name = "mov", .mode = {R_M16, sreg, END}, .size = 3},
