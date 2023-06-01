@@ -114,7 +114,21 @@ const instruction_t instructions[] = {
 	{.opcode = 0x7D, .name = "jnl", .mode = {REL8, END}, .size = 2},
 	{.opcode = 0x7E, .name = "jng", .mode = {REL8, END}, .size = 2},
 	{.opcode = 0x7F, .name = "jg", .mode = {REL8, END}, .size = 2},
-
+	{.opcode = 0x80, .extended = 0, .name = "EXTENDED", .mode = {END}, .size = 1},
+	{.opcode = 0x81, .extended = 1, .name = "EXTENDED", .mode = {END}, .size = 1},
+	{.opcode = 0x83, .extended = 2, .name = "EXTENDED", .mode = {END}, .size = 1},
+	{.opcode = 0x84, .name = "test", .mode = {R_M8, REG8, END}, .size = 2},
+	{.opcode = 0x85, .name = "test", .mode = {R_M16, REG16, END}, .size = 3},
+	{.opcode = 0x86, .name = "xchg", .mode = {R_M8, REG8, END}, .size = 2},
+	{.opcode = 0x87, .name = "xchg", .mode = {R_M16, REG16, END}, .size = 3},
+	{.opcode = 0x88, .name = "mov", .mode = {R_M8, REG8, END}, .size = 2},
+	{.opcode = 0x89, .name = "mov", .mode = {R_M16, REG16, END}, .size = 3},
+	{.opcode = 0x8A, .name = "mov", .mode = {REG8, R_M8, END}, .size = 2},
+	{.opcode = 0x8B, .name = "mov", .mode = {REG16, R_M16, END}, .size = 3},
+	// {.opcode = 0x8C, .name = "mov", .mode = {R_M16, sreg, END}, .size = 3},
+	{.opcode = 0x8D, .name = "lea", .mode = {REG16, R_M16, END}, .size = 3},
+	// {.opcode = 0x8E, .name = "mov", .mode = {sreg, R_M16, END}, .size = 3},
+	{.opcode = 0x8F, .name = "pop", .mode = {R_M16, END}, .size = 3},
 	{.opcode = 0x90, .name = "xchg ax,ax", .mode = {END}, .size = 1},
 	{.opcode = 0x91, .name = "xchg cx,ax", .mode = {END}, .size = 1},
 	{.opcode = 0x92, .name = "xchg dx,ax", .mode = {END}, .size = 1},
@@ -147,7 +161,6 @@ const instruction_t instructions[] = {
 	{.opcode = 0xAD, .name = "lodsw", .mode = {END}, .size = 1},
 	{.opcode = 0xAE, .name = "scasb", .mode = {END}, .size = 1},
 	{.opcode = 0xAF, .name = "scasw", .mode = {END}, .size = 1},
-
 	{.opcode = 0xB0, .name = "mov al", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0xB1, .name = "mov cl", .mode = {IMM8, END}, .size = 2},
 	{.opcode = 0xB2, .name = "mov dl", .mode = {IMM8, END}, .size = 2},
@@ -213,3 +226,42 @@ const instruction_t instructions[] = {
 
 	{.name = NULL}
 };
+
+const instruction_t extended[][8] = {
+	// 0x80 extended
+	{
+		{.opcode = 0x00, .name = "add", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x01, .name = "or", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x02, .name = "adc", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x03, .name = "sbb", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x04, .name = "and", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x05, .name = "sub", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x06, .name = "xor", .mode = {R_M8, IMM8, END}, .size = 2},
+		{.opcode = 0x07, .name = "cmp", .mode = {R_M8, IMM8, END}, .size = 2},
+	},
+	// 0x81 extended
+	{
+		{.opcode = 0x00, .name = "add", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x01, .name = "or", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x02, .name = "adc", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x03, .name = "sbb", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x04, .name = "and", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x05, .name = "sub", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x06, .name = "xor", .mode = {R_M16, IMM16, END}, .size = 3},
+		{.opcode = 0x07, .name = "cmp", .mode = {R_M16, IMM16, END}, .size = 3},
+	},
+	// 0x83 extended
+	{
+		{.opcode = 0x00, .name = "add", .mode = {R_M16, IMM8, END}, .size = 3},
+		{.opcode = 0x01, .name = "invalid", .mode = {END}, .size = 1},
+		{.opcode = 0x02, .name = "adc", .mode = {R_M16, IMM8, END}, .size = 3},
+		{.opcode = 0x03, .name = "sbb", .mode = {R_M16, IMM8, END}, .size = 3},
+		{.opcode = 0x04, .name = "invalid", .mode = {END}, .size = 1},
+		{.opcode = 0x05, .name = "sub", .mode = {R_M16, IMM8, END}, .size = 3},
+		{.opcode = 0x06, .name = "invalid", .mode = {END}, .size = 1},
+		{.opcode = 0x07, .name = "cmp", .mode = {R_M16, IMM8, END}, .size = 3},
+	},
+};
+
+const instruction_t invalid_instruction = { .opcode = 0xFF, .name = "unknown", .mode = {END}, .size = 1 };
+

@@ -97,15 +97,17 @@ unsigned read_size(u_int8_t *binary, unsigned size)
 	return ret;
 }
 
-instruction_t parse_inst(u_int8_t *binary)
+instruction_t parse_inst(u_int8_t *binary, unsigned long size)
 {
 	for (int i = 0; instructions[i].name; i++) {
-		if (instructions[i].opcode == *binary)
+		if (instructions[i].opcode != *binary)
+			continue;
+		if (instructions[i].extended == -1)
 			return instructions[i];
+		unsigned mod = binary[1] & 0b111000 >> 3;
+		return extended[instructions[i].extended][mod];
 	}
-	return (const instruction_t){
-		.opcode = 0xFF, .name = "unknown", .mode = {END}, .size = 1
-	};
+	return invalid_instruction;
 }
 
 int dasm(u_int8_t *binary, unsigned long size)
