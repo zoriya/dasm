@@ -27,8 +27,3 @@ Some op-code tables
 
 https://csiflabs.cs.ucdavis.edu/~ssdavis/50/8086%20Opcodes.pdf
 http://www.mlsite.net/8086/#oper_b
-
-## TODO
-
-I did not have the time to add every instructions to the table so some programs
-wont be disassembled properly.
