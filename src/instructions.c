@@ -102,8 +102,8 @@ const instruction_t instructions[] = {
 	{.opcode = 0x71, .extended = -1, .name = "jno", .mode = {REL8, END}},
 	{.opcode = 0x72, .extended = -1, .name = "jc", .mode = {REL8, END}},
 	{.opcode = 0x73, .extended = -1, .name = "jnb", .mode = {REL8, END}},
-	{.opcode = 0x74, .extended = -1, .name = "jz", .mode = {REL8, END}},
-	{.opcode = 0x75, .extended = -1, .name = "jnz", .mode = {REL8, END}},
+	{.opcode = 0x74, .extended = -1, .name = "je", .mode = {REL8, END}},
+	{.opcode = 0x75, .extended = -1, .name = "jne", .mode = {REL8, END}},
 	{.opcode = 0x76, .extended = -1, .name = "jna", .mode = {REL8, END}},
 	{.opcode = 0x77, .extended = -1, .name = "ja", .mode = {REL8, END}},
 	{.opcode = 0x78, .extended = -1, .name = "js", .mode = {REL8, END}},
@@ -116,6 +116,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x7F, .extended = -1, .name = "jg", .mode = {REL8, END}},
 	{.opcode = 0x80, .extended = 0,  .name = "EXTENDED", .mode = {END}},
 	{.opcode = 0x81, .extended = 1,  .name = "EXTENDED", .mode = {END}},
+
 	{.opcode = 0x83, .extended = 2,  .name = "EXTENDED", .mode = {END}},
 	{.opcode = 0x84, .extended = -1, .name = "test", .mode = {R_M8, REG8, END}},
 	{.opcode = 0x85, .extended = -1, .name = "test", .mode = {R_M16, REG16, END}},
@@ -190,7 +191,10 @@ const instruction_t instructions[] = {
 	{.opcode = 0xCD, .extended = -1, .name = "int", .mode = {IMM8, END}},
 	{.opcode = 0xCE, .extended = -1, .name = "into", .mode = {END}},
 	{.opcode = 0xCF, .extended = -1, .name = "iret", .mode = {END}},
-
+	{.opcode = 0xD0, .extended =  7, .name = "EXTENDED", .mode = {END}},
+	{.opcode = 0xD1, .extended =  8, .name = "EXTENDED", .mode = {END}},
+	{.opcode = 0xD2, .extended =  9, .name = "EXTENDED", .mode = {END}},
+	{.opcode = 0xD3, .extended = 10, .name = "EXTENDED", .mode = {END}},
 	{.opcode = 0xD4, .extended = -1, .name = "aam", .mode = {END}},
 	{.opcode = 0xD5, .extended = -1, .name = "aad", .mode = {END}},
 	{.opcode = 0xD7, .extended = -1, .name = "xlatb", .mode = {END}},
@@ -216,14 +220,16 @@ const instruction_t instructions[] = {
 	{.opcode = 0xF3, .extended = -1, .name = "rep", .mode = {END}},
 	{.opcode = 0xF4, .extended = -1, .name = "hlt", .mode = {END}},
 	{.opcode = 0xF5, .extended = -1, .name = "cmc", .mode = {END}},
-
+	{.opcode = 0xF6, .extended = 3,  .name = "EXTENDED", .mode = {END}},
+	{.opcode = 0xF7, .extended = 4,  .name = "EXTENDED", .mode = {END}},
 	{.opcode = 0xF8, .extended = -1, .name = "clc", .mode = {END}},
 	{.opcode = 0xF9, .extended = -1, .name = "stc", .mode = {END}},
 	{.opcode = 0xFA, .extended = -1, .name = "cli", .mode = {END}},
 	{.opcode = 0xFB, .extended = -1, .name = "sti", .mode = {END}},
 	{.opcode = 0xFC, .extended = -1, .name = "cld", .mode = {END}},
 	{.opcode = 0xFD, .extended = -1, .name = "std", .mode = {END}},
-
+	{.opcode = 0xFE, .extended = 5,  .name = "EXTENDED", .mode = {END}},
+	{.opcode = 0xFF, .extended = 6,  .name = "EXTENDED", .mode = {END}},
 	{.name = NULL}
 };
 
@@ -253,13 +259,102 @@ const instruction_t extended[][8] = {
 	// 0x83 extended
 	{
 		{.opcode = 0x00, .extended = -2, .name = "add", .mode = {R_M16, IMM8, END}},
-		{.opcode = 0x01, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x01, .extended = -2, .name = "invalid", .mode = {END}},
 		{.opcode = 0x02, .extended = -2, .name = "adc", .mode = {R_M16, IMM8, END}},
 		{.opcode = 0x03, .extended = -2, .name = "sbb", .mode = {R_M16, IMM8, END}},
-		{.opcode = 0x04, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x04, .extended = -2, .name = "invalid", .mode = {END}},
 		{.opcode = 0x05, .extended = -2, .name = "sub", .mode = {R_M16, IMM8, END}},
-		{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
 		{.opcode = 0x07, .extended = -2, .name = "cmp", .mode = {R_M16, IMM8, END}},
+	},
+	// 0xf6 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "test", .mode = {R_M8, IMM8, END}},
+		/**/{.opcode = 0x01, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x02, .extended = -2, .name = "not", .mode = {R_M8, END}},
+		{.opcode = 0x03, .extended = -2, .name = "neg", .mode = {R_M8, END}},
+		{.opcode = 0x04, .extended = -2, .name = "mul", .mode = {R_M8, END}},
+		{.opcode = 0x05, .extended = -2, .name = "imul", .mode = {R_M8, END}},
+		{.opcode = 0x06, .extended = -2, .name = "div", .mode = {R_M8, END}},
+		{.opcode = 0x07, .extended = -2, .name = "idiv", .mode = {R_M8, END}},
+	},
+	// 0xf7 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "test", .mode = {R_M16, IMM16, END}},
+		/**/{.opcode = 0x01, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x02, .extended = -2, .name = "not", .mode = {R_M16, END}},
+		{.opcode = 0x03, .extended = -2, .name = "neg", .mode = {R_M16, END}},
+		{.opcode = 0x04, .extended = -2, .name = "mul", .mode = {R_M16, END}},
+		{.opcode = 0x05, .extended = -2, .name = "imul", .mode = {R_M16, END}},
+		{.opcode = 0x06, .extended = -2, .name = "div", .mode = {R_M16, END}},
+		{.opcode = 0x07, .extended = -2, .name = "idiv", .mode = {R_M16, END}},
+	},
+	// 0xfe extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "inc", .mode = {R_M8, END}},
+		{.opcode = 0x01, .extended = -2, .name = "dec", .mode = {R_M8, END}},
+		/**/{.opcode = 0x02, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x03, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x04, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x05, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		/**/{.opcode = 0x07, .extended = -2, .name = "invalid", .mode = {END}},
+	},
+	// 0xff extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "inc", .mode = {R_M16, END}},
+		{.opcode = 0x01, .extended = -2, .name = "dec", .mode = {R_M16, END}},
+		{.opcode = 0x02, .extended = -2, .name = "call", .mode = {R_M16, END}},
+		{.opcode = 0x03, .extended = -2, .name = "call", .mode = {R_M16, END}},
+		{.opcode = 0x04, .extended = -2, .name = "jmp", .mode = {R_M16, END}},
+		{.opcode = 0x05, .extended = -2, .name = "jmp", .mode = {R_M16, END}},
+		{.opcode = 0x06, .extended = -2, .name = "push", .mode = {R_M16, END}},
+		/**/{.opcode = 0x07, .extended = -2, .name = "invalid", .mode = {END}},
+	},
+
+	// 0xd0 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "rol %s,1", .mode = {R_M8, END}},
+		{.opcode = 0x01, .extended = -2, .name = "ror %s,1", .mode = {R_M8, END}},
+		{.opcode = 0x02, .extended = -2, .name = "rcl %s,1", .mode = {R_M8, END}},
+		{.opcode = 0x03, .extended = -2, .name = "rcr %s,1", .mode = {R_M8, END}},
+		{.opcode = 0x04, .extended = -2, .name = "shl %s,1", .mode = {R_M8, END}},
+		{.opcode = 0x05, .extended = -2, .name = "shr %s,1", .mode = {R_M8, END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s,1", .mode = {R_M8, END}},
+	},
+	// 0xd1 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "rol %s,1", .mode = {R_M16, END}},
+		{.opcode = 0x01, .extended = -2, .name = "ror %s,1", .mode = {R_M16, END}},
+		{.opcode = 0x02, .extended = -2, .name = "rcl %s,1", .mode = {R_M16, END}},
+		{.opcode = 0x03, .extended = -2, .name = "rcr %s,1", .mode = {R_M16, END}},
+		{.opcode = 0x04, .extended = -2, .name = "shl %s,1", .mode = {R_M16, END}},
+		{.opcode = 0x05, .extended = -2, .name = "shr %s,1", .mode = {R_M16, END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s,1", .mode = {R_M16, END}},
+	},
+	// 0xd2 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "rol %s,cl", .mode = {R_M8, END}},
+		{.opcode = 0x01, .extended = -2, .name = "ror %s,cl", .mode = {R_M8, END}},
+		{.opcode = 0x02, .extended = -2, .name = "rcl %s,cl", .mode = {R_M8, END}},
+		{.opcode = 0x03, .extended = -2, .name = "rcr %s,cl", .mode = {R_M8, END}},
+		{.opcode = 0x04, .extended = -2, .name = "shl %s,cl", .mode = {R_M8, END}},
+		{.opcode = 0x05, .extended = -2, .name = "shr %s,cl", .mode = {R_M8, END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s,cl", .mode = {R_M8, END}},
+	},
+	// 0xd3 extended
+	{
+		{.opcode = 0x00, .extended = -2, .name = "rol %s,cl", .mode = {R_M16, END}},
+		{.opcode = 0x01, .extended = -2, .name = "ror %s,cl", .mode = {R_M16, END}},
+		{.opcode = 0x02, .extended = -2, .name = "rcl %s,cl", .mode = {R_M16, END}},
+		{.opcode = 0x03, .extended = -2, .name = "rcr %s,cl", .mode = {R_M16, END}},
+		{.opcode = 0x04, .extended = -2, .name = "shl %s,cl", .mode = {R_M16, END}},
+		{.opcode = 0x05, .extended = -2, .name = "shr %s,cl", .mode = {R_M16, END}},
+		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s,cl", .mode = {R_M16, END}},
 	},
 };
 
