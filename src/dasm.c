@@ -9,7 +9,7 @@ const char *registers8[] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 const char *registers16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
 
 
-void print_rm_operand(unsigned inst_size, u_int8_t *binary, bool is16bit)
+int print_rm_operand(u_int8_t *binary, int imm_idx, bool is16bit)
 {
 	unsigned mod = binary[1] >> 6;
 	unsigned rm = binary[1] & 0b111;
@@ -17,19 +17,23 @@ void print_rm_operand(unsigned inst_size, u_int8_t *binary, bool is16bit)
 
 	if (mod == 0b11) {
 		printf("%s", is16bit ? registers16[rm] : registers8[rm]);
-		return;
+		return 0;
 	}
 
 	if (mod == 0 && rm == 0b110) {
-		printf("[%04x]", (binary[inst_size - 1] << 8) | binary[inst_size - 2]);
-		return;
+		printf("[%04x]", (binary[imm_idx + 1] << 8) | binary[imm_idx]);
+		return 2;
 	}
 
+	int imm_offset = 0;
+
 	if (mod == 0b10) {
-		snprintf(disp, sizeof(disp), "+%04x", binary[inst_size - 1] | (binary[inst_size - 2] << 8));
+		snprintf(disp, sizeof(disp), "+%x", (binary[imm_idx + 1] << 8) | binary[imm_idx]);
+		imm_offset += 2;
 	}
 	if (mod == 0b01) {
-		int8_t disp_v = binary[inst_size - 1];
+		int8_t disp_v = binary[imm_idx];
+		imm_offset++;
 		snprintf(disp, 20, "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
 	}
 
@@ -44,6 +48,7 @@ void print_rm_operand(unsigned inst_size, u_int8_t *binary, bool is16bit)
 		case 0x06: printf("[bp%s]", disp); break;
 		case 0x07: printf("[bx%s]", disp); break;
 	}
+	return imm_offset;
 }
 
 unsigned read_size(u_int8_t *binary, unsigned size)
@@ -57,10 +62,22 @@ unsigned read_size(u_int8_t *binary, unsigned size)
 	return ret;
 }
 
+bool has_reg(instruction_t inst)
+{
+	for (int i = 0; inst.mode[i] != END; i++) {
+		if (inst.mode[i] == REG8 || inst.mode[i] == REG16)
+			return true;
+	}
+	return false;
+}
+
 void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary)
 {
 	bool need_comma = strchr(inst.name, ' ');
+	int imm_idx = 1 + (inst.extended != -1 || has_reg(inst));
+
 	printf("%04x: %0*x%-*s %s", addr, inst_size * 2, read_size(binary, inst_size), 13 - inst_size * 2, "", inst.name);
+
 	for (int i = 0; inst.mode[i] != END; i++) {
 		if (need_comma)
 			printf(", ");
@@ -69,16 +86,18 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 		need_comma = true;
 		switch (inst.mode[i]) {
 		case IMM8:
-			printf("%02x", binary[inst_size - 1]);
+			printf("%02x", binary[imm_idx++]);
 			break;
 		case IMM16:
-			printf("%04x", (binary[inst_size - 1] << 8) | binary[inst_size - 2]);
+			printf("%04x", (binary[imm_idx + 1] << 8) | binary[imm_idx]);
+			imm_idx += 2;
 			break;
 		case REL8:
-			printf("%04x", addr + inst_size + (int8_t)binary[inst_size - 1]);
+			printf("%04x", addr + inst_size + (int8_t)binary[imm_idx++]);
 			break;
 		case REL16:
-			printf("%04x", addr + inst_size + (int16_t)((binary[inst_size - 1] << 8) | binary[inst_size - 2]));
+			printf("%04x", addr + inst_size + (int16_t)((binary[imm_idx + 1] << 8) | binary[imm_idx]));
+			imm_idx += 2;
 			break;
 		case REG8:
 			printf("%s", registers8[(binary[1] & 0b111000) >> 3]);
@@ -87,10 +106,10 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 			printf("%s", registers16[(binary[1] & 0b111000) >> 3]);
 			break;
 		case R_M8:
-			print_rm_operand(inst_size, binary, false);
+			imm_idx += print_rm_operand(binary, imm_idx, false);
 			break;
 		case R_M16:
-			print_rm_operand(inst_size, binary, true);
+			imm_idx += print_rm_operand(binary, imm_idx, true);
 			break;
 		case END:
 			break;
