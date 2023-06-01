@@ -20,15 +20,17 @@ void print_rm_operand(unsigned inst_size, u_int8_t *binary, bool is16bit)
 		return;
 	}
 
+	if (mod == 0 && rm == 0b110) {
+		printf("[%04x]", (binary[inst_size - 1] << 8) | binary[inst_size - 2]);
+		return;
+	}
+
 	if (mod == 0b10) {
 		snprintf(disp, sizeof(disp), "+%04x", binary[inst_size - 1] | (binary[inst_size - 2] << 8));
 	}
-	if (mod == 0 && rm == 0b110) {
-		snprintf(disp, sizeof(disp), "+%04x", (binary[inst_size - 1] << 8) | binary[inst_size - 2]);
-	}
 	if (mod == 0b01) {
 		int8_t disp_v = binary[inst_size - 1];
-		snprintf(disp, 20, "%c%x", disp_v < 0 ? '-' : '+', disp_v);
+		snprintf(disp, 20, "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
 	}
 
 	switch (rm)
@@ -106,11 +108,14 @@ instruction_t parse_inst(u_int8_t *binary, unsigned long size)
 		if (instructions[i].extended == -1)
 			return instructions[i];
 
-		if (size < 2)
+		if (size < 2) {
+			dprintf(2, "Invalid extended instruction.\n");
 			return invalid_instruction;
+		}
 		unsigned mod = (binary[1] & 0b111000) >> 3;
 		return extended[instructions[i].extended][mod];
 	}
+	dprintf(2, "Not implemented instruction: %x\n", *binary);
 	return invalid_instruction;
 }
 
