@@ -38,7 +38,6 @@ typedef enum addressing_mode {
 typedef struct instruction {
 	u_int8_t opcode;
 	const char *name;
-	unsigned size;
 	addressing_mode_t mode[5];
 	int extended;
 } instruction_t;
