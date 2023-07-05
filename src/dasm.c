@@ -37,8 +37,7 @@ int print_rm_operand(u_int8_t *binary, int imm_idx, bool is16bit)
 		snprintf(disp, sizeof(disp), "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
 	}
 
-	switch (rm)
-	{
+	switch (rm) {
 		case 0x00: printf("[bx+si%s]", disp); break;
 		case 0x01: printf("[bx+di%s]", disp); break;
 		case 0x02: printf("[bp+si%s]", disp); break;

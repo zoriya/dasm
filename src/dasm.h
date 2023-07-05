@@ -1,8 +1,8 @@
 #pragma once
 
-#include "interpretor.h"
 #include <sys/types.h>
 #include <stdbool.h>
+#include "interpretor.h"
 
 #define FALLTHROUGHT __attribute__((fallthrough));
 
@@ -62,3 +62,6 @@ instruction_t parse_inst(u_int8_t *binary, unsigned long size);
 unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size);
 void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary, bool space);
 bool has_reg(const instruction_t *inst);
+
+void *get_operand(const instruction_t *inst, unsigned i, state_t *state);
+bool is_operand_wide(const instruction_t *inst, unsigned i);

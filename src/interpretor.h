@@ -55,8 +55,12 @@ typedef struct state {
 	};
 
 	uint8_t *binary;
+	unsigned binary_size;
 
 	struct {
 		unsigned imm_idx;
+		// A bunch of unsigneds to store temporary operands and return them as pointers.
+		// instructions can't write to it, they are effectivly read-only.
+		unsigned operand_holder[5];
 	} parse_data;
 } state_t;
