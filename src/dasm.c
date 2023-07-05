@@ -112,6 +112,12 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 		case REG16:
 			printf("%s", registers16[(binary[1] & 0b111000) >> 3]);
 			break;
+		case OPREG8:
+			printf("%s", registers8[binary[0] & 0b111]);
+			break;
+		case OPREG16:
+			printf("%s", registers16[binary[0] & 0b111]);
+			break;
 		case R_M8:
 			imm_idx += print_rm_operand(binary, imm_idx, false);
 			break;
@@ -158,6 +164,8 @@ unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size)
 		case REG8:
 			has_extended_mod = true;
 			break;
+		case OPREG8:
+		case OPREG16:
 		case END:
 			break;
 		}

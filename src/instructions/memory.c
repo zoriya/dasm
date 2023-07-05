@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "../dasm.h"
 
-unsigned *get_reg_operand(state_t *state, bool is16bit)
+void *get_reg_operand(state_t *state, bool is16bit, bool is_in_op)
 {
 	uint8_t *registers8[8] = {
 		&state->al,
@@ -26,18 +26,21 @@ unsigned *get_reg_operand(state_t *state, bool is16bit)
 		&state->di,
 	};
 
+	unsigned reg = is_in_op
+		? state->binary[state->pc] & 0b111
+		: (state->binary[state->pc + 1] & 0b111000) >> 3;
 	if (is16bit)
-		return (void *)registers16[(state->binary[state->pc + 1] & 0b111000) >> 3];
-	return (void *)registers8[(state->binary[state->pc + 1] & 0b111000) >> 3];
+		return (void *)registers16[reg];
+	return (void *)registers8[reg];
 }
 
-unsigned *get_rm_operand(const instruction_t *inst, state_t *state, unsigned *imm_idx, bool is16bit)
+void *get_rm_operand(const instruction_t *inst, state_t *state, unsigned *imm_idx, bool is16bit)
 {
 	unsigned mod = state->binary[1] >> 6;
 	unsigned rm = state->binary[1] & 0b111;
 
 	if (mod == 0b11)
-		return get_reg_operand(state, is16bit);
+		return get_reg_operand(state, is16bit, false);
 
 	if (mod == 0 && rm == 0b110) {
 		*imm_idx += 2;
@@ -47,9 +50,9 @@ unsigned *get_rm_operand(const instruction_t *inst, state_t *state, unsigned *im
 	return NULL;
 }
 
-unsigned *get_operand(const instruction_t *inst, unsigned i, state_t *state)
+void *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 {
-	unsigned *ret = NULL;
+	void *ret = NULL;
 	unsigned imm_idx = 0;
 
 	switch (inst->mode[i]) {
@@ -69,10 +72,16 @@ unsigned *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		// TODO:
 		break;
 	case REG8:
-		ret = get_reg_operand(state, false);
+		ret = get_reg_operand(state, false, false);
 		break;
 	case REG16:
-		ret = get_reg_operand(state, true);
+		ret = get_reg_operand(state, true, false);
+		break;
+	case OPREG8:
+		ret = get_reg_operand(state, false, true);
+		break;
+	case OPREG16:
+		ret = get_reg_operand(state, true, true);
 		break;
 	case R_M8:
 		ret = get_rm_operand(inst, state, &imm_idx, false);
@@ -88,11 +97,33 @@ unsigned *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 	return ret;
 }
 
+bool is_operand_wide(const instruction_t *inst, unsigned i)
+{
+	switch (inst->mode[i]) {
+	case REG8:
+	case OPREG8:
+	case R_M8:
+	case IMM8:
+	case REL8:
+		return false;
+	case REG16:
+	case OPREG16:
+	case R_M16:
+	case IMM16:
+	case REL16:
+	case END:
+		return true;
+	}
+	return true;
+}
+
 void mov(const instruction_t *self, state_t *state)
 {
-	unsigned *from = get_operand(self, 0, state);
-	unsigned *to = get_operand(self, 1, state);
+	void *from = get_operand(self, 0, state);
+	void *to = get_operand(self, 1, state);
 
-	printf("mov %p %p\n", from, to);
-	printf("mov %x %x\n", (uint16_t)*from, (uint16_t)*to);
+	if (is_operand_wide(self, 0))
+		*(uint16_t *)from = *(uint16_t *)to;
+	else
+		*(uint8_t *)from = *(uint8_t *)to;
 }
