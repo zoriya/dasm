@@ -4,7 +4,8 @@ LDFLAGS =
 
 SRC = src/main.c \
 	  src/dasm.c \
-	  src/instructions.c
+	  src/instructions.c \
+	  src/interpretor.c
 
 OBJ = $(SRC:%.c=%.o)
 

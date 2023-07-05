@@ -71,7 +71,7 @@ bool has_reg(instruction_t inst)
 	return false;
 }
 
-void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary)
+void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary, bool space)
 {
 	char *last_param = strchr(inst.name, '%');
 	// if the instruction has already a param in it (ex `in al`), we need to directly add a comma.
@@ -79,7 +79,7 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	bool need_comma = !last_param && strchr(inst.name, ' ') && inst.opcode != 0xEB;
 	int imm_idx = 1 + (inst.extended != -1 || has_reg(inst));
 
-	printf("%04x: %0*x%-*s", addr, inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
+	printf("%04x:%s%0*x%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
 	if (last_param)
 		printf("%.*s", (int)(last_param - inst.name - 1), inst.name);
 	else
@@ -125,26 +125,6 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	if (last_param)
 		printf("%s", last_param + 2);
 	printf("\n");
-}
-
-instruction_t parse_inst(u_int8_t *binary, unsigned long size)
-{
-	for (int i = 0; instructions[i].name; i++) {
-		if (instructions[i].opcode != *binary)
-			continue;
-
-		if (instructions[i].extended == -1)
-			return instructions[i];
-
-		if (size < 2) {
-			dprintf(2, "Invalid extended instruction.\n");
-			return invalid_instruction;
-		}
-		unsigned mod = (binary[1] & 0b111000) >> 3;
-		return extended[instructions[i].extended][mod];
-	}
-	dprintf(2, "Not implemented instruction: %x\n", *binary);
-	return invalid_instruction;
 }
 
 unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size)
@@ -207,7 +187,7 @@ int dasm(u_int8_t *binary, unsigned long size)
 			printf("%04x: %02x            (undefined)\n", pc, inst.opcode);
 			return 0;
 		}
-		print_instruction(pc, inst, inst_size, binary);
+		print_instruction(pc, inst, inst_size, binary, true);
 		pc += inst_size;
 		binary += inst_size;
 	}

@@ -1,6 +1,10 @@
+#pragma once
+
 #include <sys/types.h>
+#include <stdbool.h>
 
 int dasm(u_int8_t *binary, unsigned long size);
+int interpret(u_int8_t *binary, unsigned long size);
 
 // typedef enum addressing_mode {
 // 	/// Param is the data (MOV AL, ~68FE~)
@@ -45,3 +49,8 @@ typedef struct instruction {
 extern const instruction_t instructions[];
 extern const instruction_t extended[][8];
 extern const instruction_t invalid_instruction;
+
+instruction_t parse_inst(u_int8_t *binary, unsigned long size);
+unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size);
+void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary, bool space);
+

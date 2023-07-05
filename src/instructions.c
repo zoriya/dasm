@@ -1,5 +1,26 @@
 #include <stddef.h>
+#include <stdio.h>
 #include "dasm.h"
+
+instruction_t parse_inst(u_int8_t *binary, unsigned long size)
+{
+	for (int i = 0; instructions[i].name; i++) {
+		if (instructions[i].opcode != *binary)
+			continue;
+
+		if (instructions[i].extended == -1)
+			return instructions[i];
+
+		if (size < 2) {
+			dprintf(2, "Invalid extended instruction.\n");
+			return invalid_instruction;
+		}
+		unsigned mod = (binary[1] & 0b111000) >> 3;
+		return extended[instructions[i].extended][mod];
+	}
+	dprintf(2, "Not implemented instruction: %x\n", *binary);
+	return invalid_instruction;
+}
 
 const instruction_t instructions[] = {
 	{.opcode = 0x00, .extended = -1, .name = "add", .mode = {R_M8, REG8, END}},
