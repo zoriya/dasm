@@ -47,6 +47,10 @@ int interpret(u_int8_t *binary, unsigned long size)
 		}
 		print_state(state);
 		print_instruction(state->pc, inst, inst_size, binary, false);
+		if (inst.exec)
+			inst.exec(state);
+		else
+			printf("Not implemented.\n");
 		state->pc += inst_size;
 		binary += inst_size;
 	}

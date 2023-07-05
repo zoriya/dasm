@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interpretor.h"
 #include <sys/types.h>
 #include <stdbool.h>
 
@@ -44,6 +45,7 @@ typedef struct instruction {
 	const char *name;
 	addressing_mode_t mode[5];
 	int extended;
+	void (*exec)(state_t *state);
 } instruction_t;
 
 extern const instruction_t instructions[];
