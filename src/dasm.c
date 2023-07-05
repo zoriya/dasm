@@ -34,7 +34,7 @@ int print_rm_operand(u_int8_t *binary, int imm_idx, bool is16bit)
 	if (mod == 0b01) {
 		int8_t disp_v = binary[imm_idx];
 		imm_offset++;
-		snprintf(disp, 20, "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
+		snprintf(disp, sizeof(disp), "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
 	}
 
 	switch (rm)
@@ -62,10 +62,10 @@ unsigned read_size(u_int8_t *binary, unsigned size)
 	return ret;
 }
 
-bool has_reg(instruction_t inst)
+bool has_reg(const instruction_t *inst)
 {
-	for (int i = 0; inst.mode[i] != END; i++) {
-		if (inst.mode[i] == REG8 || inst.mode[i] == REG16)
+	for (int i = 0; inst->mode[i] != END; i++) {
+		if (inst->mode[i] == REG8 || inst->mode[i] == REG16)
 			return true;
 	}
 	return false;
@@ -77,7 +77,7 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	// if the instruction has already a param in it (ex `in al`), we need to directly add a comma.
 	// `jmp short` is an exception as it is the only instruction with a space in it that is not a parameter.
 	bool need_comma = !last_param && strchr(inst.name, ' ') && inst.opcode != 0xEB;
-	int imm_idx = 1 + (inst.extended != -1 || has_reg(inst));
+	int imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
 
 	printf("%04x:%s%0*x%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
 	if (last_param)

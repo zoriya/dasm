@@ -5,7 +5,8 @@ LDFLAGS =
 SRC = src/main.c \
 	  src/dasm.c \
 	  src/instructions.c \
-	  src/interpretor.c
+	  src/interpretor.c \
+	  src/instructions/memory.c
 
 OBJ = $(SRC:%.c=%.o)
 

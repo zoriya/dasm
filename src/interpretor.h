@@ -53,4 +53,10 @@ typedef struct state {
 		};
 		unsigned flags:10;
 	};
+
+	uint8_t *binary;
+
+	struct {
+		unsigned imm_idx;
+	} parse_data;
 } state_t;
