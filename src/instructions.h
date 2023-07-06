@@ -4,3 +4,4 @@
 #include "interpretor.h"
 
 void mov(const instruction_t *self, state_t *state);
+void int_inst(const instruction_t *self, state_t *state);

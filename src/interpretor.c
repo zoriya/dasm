@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include "dasm.h"
@@ -54,21 +55,21 @@ void *get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 
 	switch (rm) {
 	case 0x00:
-		return state->binary + state->bx + state->si + disp;
+		return state->memory + state->bx + state->si + disp;
 	case 0x01:
-		return state->binary + state->bx + state->di + disp;
+		return state->memory + state->bx + state->di + disp;
 	case 0x02:
-		return state->binary + state->bp + state->si + disp;
+		return state->memory + state->bp + state->si + disp;
 	case 0x03:
-		return state->binary + state->bp + state->di + disp;
+		return state->memory + state->bp + state->di + disp;
 	case 0x04:
-		return state->binary + state->si + disp;
+		return state->memory + state->si + disp;
 	case 0x05:
-		return state->binary + state->di + disp;
+		return state->memory + state->di + disp;
 	case 0x06:
-		return state->binary + state->bp + disp;
+		return state->memory + state->bp + disp;
 	case 0x07:
-		return state->binary + state->bx + disp;
+		return state->memory + state->bx + disp;
 	}
 	return NULL;
 }
@@ -169,18 +170,25 @@ int interpret(u_int8_t *binary, unsigned long size)
 {
 	state_t *state = calloc(sizeof(*state), 1);
 	int header_size = 0;
+	int dsize= 0;
+
+	state->sp = 0xFFDC;
 
 	if (binary[0] == 0xEB && binary[1] == 0x0E) {
 		header_size = 16;
 		size = binary[2] | (binary[3] << 8);
+		dsize = binary[4] | (binary[5] << 8);
 	} else if (binary[0] == 0x01 && binary[1] == 0x03) {
 		header_size = binary[4];
 		size = binary[8]  | (binary[9] << 8)  | (binary[10] << 16) | (binary[11] << 24);
+		dsize = binary[12] | (binary[13] << 8) | (binary[14] << 16) | (binary[15] << 24);
 	}
 
 	binary += header_size;
 	state->binary = binary;
 	state->binary_size = size;
+
+	memcpy(state->memory, binary + size, dsize);
 
 	printf(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n");
 	while (state->pc < size) {

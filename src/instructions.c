@@ -210,7 +210,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0xCA, .extended = -1, .name = "retf", .mode = {IMM16, END}, .exec = NULL},
 	{.opcode = 0xCB, .extended = -1, .name = "retf", .mode = {END}, .exec = NULL},
 	{.opcode = 0xCC, .extended = -1, .name = "int3", .mode = {END}, .exec = NULL},
-	{.opcode = 0xCD, .extended = -1, .name = "int", .mode = {IMM8, END}, .exec = NULL},
+	{.opcode = 0xCD, .extended = -1, .name = "int", .mode = {IMM8, END}, .exec = &int_inst},
 	{.opcode = 0xCE, .extended = -1, .name = "into", .mode = {END}, .exec = NULL},
 	{.opcode = 0xCF, .extended = -1, .name = "iret", .mode = {END}, .exec = NULL},
 	{.opcode = 0xD0, .extended =  7, .name = "EXTENDED", .mode = {END}, .exec = NULL},

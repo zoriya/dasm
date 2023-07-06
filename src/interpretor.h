@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define MEMORY_SIZE 65536
+
 typedef struct state {
 	union {
 		struct {
@@ -57,6 +59,8 @@ typedef struct state {
 	uint8_t *binary;
 	unsigned binary_size;
 
+	uint8_t memory[MEMORY_SIZE];
+
 	struct {
 		unsigned imm_idx;
 		// A bunch of unsigneds to store temporary operands and return them as pointers.
@@ -64,3 +68,8 @@ typedef struct state {
 		unsigned operand_holder[5];
 	} parse_data;
 } state_t;
+
+typedef struct {
+	uint16_t source;
+	uint16_t type;
+} syscall_t;
