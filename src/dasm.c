@@ -78,7 +78,7 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	bool need_comma = !last_param && strchr(inst.name, ' ') && inst.opcode != 0xEB;
 	int imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
 
-	printf("%04x:%s%0*lx%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
+	printf("%04x:%s%0*lx%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2 - !space, "");
 	if (last_param)
 		printf("%.*s", (int)(last_param - inst.name - 1), inst.name);
 	else

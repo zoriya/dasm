@@ -169,7 +169,7 @@ int interpret(u_int8_t *binary, unsigned long size)
 	int header_size = 0;
 	int dsize= 0;
 
-	state->sp = 0xFFDC;
+	state->sp = 0xFFC0;
 
 	if (binary[0] == 0xEB && binary[1] == 0x0E) {
 		header_size = 16;

@@ -35,6 +35,13 @@ void call(const instruction_t *self, state_t *state)
 	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 }
 
+void jmp(const instruction_t *self, state_t *state)
+{
+	uint16_t pc = *(uint16_t *)get_operand(self, 0, state);
+
+	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
 void int_inst(const instruction_t *self, state_t *state)
 {
 	// I have no clue what the use of type is.
