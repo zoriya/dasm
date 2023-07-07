@@ -26,6 +26,15 @@ void push(const instruction_t *self, state_t *state)
 	state->memory[state->sp--] = what & 0xFF;
 }
 
+void call(const instruction_t *self, state_t *state)
+{
+	uint16_t pc = *(uint16_t *)get_operand(self, 0, state);
+
+	state->memory[state->sp--] = state->pc >> 8;
+	state->memory[state->sp--] = state->pc & 0xFF;
+	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
 void int_inst(const instruction_t *self, state_t *state)
 {
 	// I have no clue what the use of type is.

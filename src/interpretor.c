@@ -189,20 +189,19 @@ int interpret(u_int8_t *binary, unsigned long size)
 
 	printf(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n");
 	while (state->pc < size) {
-		instruction_t inst = parse_inst(binary, size - state->pc);
-		unsigned inst_size = get_inst_size(inst, binary, size - state->pc);
+		instruction_t inst = parse_inst(state->binary + state->pc, size - state->pc);
+		unsigned inst_size = get_inst_size(inst, state->binary + state->pc, size - state->pc);
 		if (state->pc + inst_size > size) {
 			return 0;
 		}
 		print_state(state);
-		print_instruction(state->pc, inst, inst_size, binary, false);
+		print_instruction(state->pc, inst, inst_size, state->binary + state->pc, false);
 		state->parse_data.imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
 		if (inst.exec)
 			inst.exec(&inst, state);
 		else
 			printf("Not implemented.\n");
 		state->pc += inst_size;
-		binary += inst_size;
 	}
 	return 0;
 }
