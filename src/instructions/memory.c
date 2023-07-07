@@ -17,6 +17,15 @@ void mov(const instruction_t *self, state_t *state)
 		*(uint8_t *)from = *(uint8_t *)to;
 }
 
+void push(const instruction_t *self, state_t *state)
+{
+	uint16_t what = *(uint16_t *)get_operand(self, 0, state);
+
+	if (is_operand_wide(self, 0))
+		state->memory[state->sp--] = what >> 8;
+	state->memory[state->sp--] = what & 0xFF;
+}
+
 void int_inst(const instruction_t *self, state_t *state)
 {
 	// I have no clue what the use of type is.

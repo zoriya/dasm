@@ -5,7 +5,7 @@
 #include "dasm.h"
 #include "interpretor.h"
 
-void *get_reg_operand(state_t *state, bool is16bit, bool is_in_op)
+void *get_reg_operand(state_t *state, bool is16bit, unsigned reg)
 {
 	uint8_t *registers8[8] = {
 		&state->al,
@@ -28,9 +28,6 @@ void *get_reg_operand(state_t *state, bool is16bit, bool is_in_op)
 		&state->di,
 	};
 
-	unsigned reg = is_in_op
-		? state->binary[state->pc] & 0b111
-		: (state->binary[state->pc + 1] & 0b111000) >> 3;
 	if (is16bit)
 		return registers16[reg];
 	return registers8[reg];
@@ -42,7 +39,7 @@ void *get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 	unsigned rm = state->binary[state->pc + 1] & 0b111;
 
 	if (mod == 0b11)
-		return get_reg_operand(state, is16bit, false);
+		return get_reg_operand(state, is16bit, rm);
 
 	if (mod == 0 && rm == 0b110) {
 		*imm_idx += 2;
@@ -102,16 +99,16 @@ void *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		ret = &state->parse_data.operand_holder[i];
 		break;
 	case REG8:
-		ret = get_reg_operand(state, false, false);
+		ret = get_reg_operand(state, false, (state->binary[state->pc + 1] & 0b111000) >> 3);
 		break;
 	case REG16:
-		ret = get_reg_operand(state, true, false);
+		ret = get_reg_operand(state, true, (state->binary[state->pc + 1] & 0b111000) >> 3);
 		break;
 	case OPREG8:
-		ret = get_reg_operand(state, false, true);
+		ret = get_reg_operand(state, false, state->binary[state->pc] & 0b111);
 		break;
 	case OPREG16:
-		ret = get_reg_operand(state, true, true);
+		ret = get_reg_operand(state, true, state->binary[state->pc] & 0b111);
 		break;
 	case R_M8:
 		ret = get_rm_operand(state, &imm_idx, false);
