@@ -50,9 +50,9 @@ int print_rm_operand(u_int8_t *binary, int imm_idx, bool is16bit)
 	return imm_offset;
 }
 
-unsigned read_size(u_int8_t *binary, unsigned size)
+unsigned long read_size(u_int8_t *binary, unsigned size)
 {
-	unsigned ret = binary[0];
+	unsigned long ret = binary[0];
 
 	for (unsigned i = 1; i < size; i++) {
 		ret <<= 8;
@@ -78,7 +78,7 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	bool need_comma = !last_param && strchr(inst.name, ' ') && inst.opcode != 0xEB;
 	int imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
 
-	printf("%04x:%s%0*x%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
+	printf("%04x:%s%0*lx%-*s", addr, space ? " " : "", inst_size * 2, read_size(binary, inst_size), 14 - inst_size * 2, "");
 	if (last_param)
 		printf("%.*s", (int)(last_param - inst.name - 1), inst.name);
 	else

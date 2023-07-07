@@ -32,21 +32,21 @@ void *get_reg_operand(state_t *state, bool is16bit, bool is_in_op)
 		? state->binary[state->pc] & 0b111
 		: (state->binary[state->pc + 1] & 0b111000) >> 3;
 	if (is16bit)
-		return (void *)registers16[reg];
-	return (void *)registers8[reg];
+		return registers16[reg];
+	return registers8[reg];
 }
 
 void *get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 {
-	unsigned mod = state->binary[1] >> 6;
-	unsigned rm = state->binary[1] & 0b111;
+	unsigned mod = state->binary[state->pc + 1] >> 6;
+	unsigned rm = state->binary[state->pc + 1] & 0b111;
 
 	if (mod == 0b11)
 		return get_reg_operand(state, is16bit, false);
 
 	if (mod == 0 && rm == 0b110) {
 		*imm_idx += 2;
-		return (void *)&state->binary[state->pc + *imm_idx - 2];
+		return state->memory + state->binary[state->pc + state->parse_data.imm_idx];
 	}
 	int disp = mod == 0b10
 		? *(uint16_t*)&state->binary[state->pc + state->parse_data.imm_idx]
@@ -90,14 +90,14 @@ void *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 	case REL16:
 		imm_idx += 2;
 		state->parse_data.operand_holder[i] = state->pc
-				+ get_inst_size(*inst, state->binary, state->binary_size - state->pc)
+				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
 				+ (int16_t)state->binary[state->pc + state->parse_data.imm_idx];
 		ret = &state->parse_data.operand_holder[i];
 		break;
 	case REL8:
 		imm_idx++;
 		state->parse_data.operand_holder[i] = state->pc
-				+ get_inst_size(*inst, state->binary, state->binary_size - state->pc)
+				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
 				+ (int8_t)state->binary[state->pc + state->parse_data.imm_idx];
 		ret = &state->parse_data.operand_holder[i];
 		break;

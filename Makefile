@@ -6,7 +6,8 @@ SRC = src/main.c \
 	  src/dasm.c \
 	  src/instructions.c \
 	  src/interpretor.c \
-	  src/instructions/memory.c
+	  src/instructions/memory.c \
+	  src/instructions/arithmetics.c
 
 OBJ = $(SRC:%.c=%.o)
 

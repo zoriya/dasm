@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include "../dasm.h"
 #include "../interpretor.h"
-#include "sys/types.h"
 
 void mov(const instruction_t *self, state_t *state)
 {
@@ -30,7 +29,7 @@ void int_inst(const instruction_t *self, state_t *state)
 	switch (syscall->type) {
 	case 0x1:
 		printf("<exit(%d)>\n", *args);
-		exit(state->bx);
+		exit(*args);
 	case 0x2:
 		printf("<fork() => %d>\n", 0);
 		printf("Not implemented\n");
