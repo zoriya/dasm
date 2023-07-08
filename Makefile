@@ -25,5 +25,5 @@ fclean: clean
 
 re: fclean all
 
-dbg: $(CFLAGS += -g)
+dbg: CFLAGS += -g -O0
 dbg: re

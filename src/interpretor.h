@@ -65,7 +65,7 @@ typedef struct state {
 		unsigned imm_idx;
 		// A bunch of unsigneds to store temporary operands and return them as pointers.
 		// instructions can't write to it, they are effectivly read-only.
-		unsigned operand_holder[5];
+		uint8_t operand_holder[5];
 	} parse_data;
 } state_t;
 
@@ -73,3 +73,15 @@ typedef struct {
 	uint16_t source;
 	uint16_t type;
 } syscall_t;
+
+enum operand_type {
+	BIT8,
+	BIT16,
+	BIT16_SMALL_ENDIAN,
+};
+
+typedef struct {
+	uint8_t *ptr;
+	enum operand_type type;
+} operand_t;
+

@@ -8,18 +8,16 @@
 
 void mov(const instruction_t *self, state_t *state)
 {
-	void *from = get_operand(self, 0, state);
-	void *to = get_operand(self, 1, state);
+	operand_t from = get_operand(self, 0, state);
+	operand_t to = get_operand(self, 1, state);
 
-	if (is_operand_wide(self, 0))
-		*(uint16_t *)from = *(uint16_t *)to;
-	else
-		*(uint8_t *)from = *(uint8_t *)to;
+	// from = to;
+	write_op(from, read_op(to));
 }
 
 void push(const instruction_t *self, state_t *state)
 {
-	uint16_t what = *(uint16_t *)get_operand(self, 0, state);
+	unsigned what = read_op(get_operand(self, 0, state));
 
 	if (is_operand_wide(self, 0))
 		state->memory[state->sp--] = what >> 8;
@@ -28,7 +26,7 @@ void push(const instruction_t *self, state_t *state)
 
 void call(const instruction_t *self, state_t *state)
 {
-	uint16_t pc = *(uint16_t *)get_operand(self, 0, state);
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	state->memory[state->sp--] = state->pc >> 8;
 	state->memory[state->sp--] = state->pc & 0xFF;
@@ -37,7 +35,7 @@ void call(const instruction_t *self, state_t *state)
 
 void jmp(const instruction_t *self, state_t *state)
 {
-	uint16_t pc = *(uint16_t *)get_operand(self, 0, state);
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 }

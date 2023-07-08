@@ -6,7 +6,36 @@
 #include "dasm.h"
 #include "interpretor.h"
 
-void *get_reg_operand(state_t *state, bool is16bit, unsigned reg)
+void write_op(operand_t op, unsigned new_value)
+{
+	switch (op.type) {
+	case BIT8:
+		*op.ptr = new_value;
+		break;
+	case BIT16_SMALL_ENDIAN:
+		*(uint16_t *)op.ptr = new_value;
+		break;
+	case BIT16:
+		op.ptr[0] = new_value & 0xFF;
+		op.ptr[1] = new_value >> 8;
+		break;
+	}
+}
+
+unsigned read_op(operand_t op)
+{
+	switch (op.type) {
+	case BIT8:
+		return *op.ptr;
+	case BIT16_SMALL_ENDIAN:
+		return *(uint16_t *)op.ptr;
+	case BIT16:
+		return op.ptr[0] | (op.ptr[1] << 8);
+	}
+	return 0;
+}
+
+operand_t get_reg_operand(state_t *state, bool is16bit, unsigned reg)
 {
 	uint8_t *registers8[8] = {
 		&state->al,
@@ -29,12 +58,13 @@ void *get_reg_operand(state_t *state, bool is16bit, unsigned reg)
 		&state->di,
 	};
 
-	if (is16bit)
-		return registers16[reg];
-	return registers8[reg];
+	return (operand_t){
+		.ptr = is16bit ? (uint8_t *)registers16[reg]: registers8[reg],
+		.type = is16bit ? BIT16_SMALL_ENDIAN : BIT8,
+	};
 }
 
-void *get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
+operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 {
 	unsigned mod = state->binary[state->pc + 1] >> 6;
 	unsigned rm = state->binary[state->pc + 1] & 0b111;
@@ -44,37 +74,50 @@ void *get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 
 	if (mod == 0 && rm == 0b110) {
 		*imm_idx += 2;
-		return state->memory + state->binary[state->pc + state->parse_data.imm_idx];
+		return (operand_t){
+			.ptr = state->memory + state->binary[state->pc + state->parse_data.imm_idx],
+			.type = is16bit ? BIT16 : BIT8
+		};
 	}
-	int disp = mod == 0b10
-		? *(uint16_t*)&state->binary[state->pc + state->parse_data.imm_idx]
-		: (int8_t)state->binary[state->pc + state->parse_data.imm_idx];
+	unsigned disp = read_op((operand_t){
+		.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
+		.type = mod == 0b10 ? BIT16 : BIT8}
+	);
 	state->parse_data.imm_idx += mod == 0b10 ? 2 : 1;
 
+	operand_t ret = {.ptr = NULL, .type = is16bit ? BIT16 : BIT8};
 	switch (rm) {
 	case 0x00:
-		return state->memory + state->bx + state->si + disp;
+		ret.ptr = state->memory + state->bx + state->si + disp;
+		break;
 	case 0x01:
-		return state->memory + state->bx + state->di + disp;
+		ret.ptr = state->memory + state->bx + state->di + disp;
+		break;
 	case 0x02:
-		return state->memory + state->bp + state->si + disp;
+		ret.ptr = state->memory + state->bp + state->si + disp;
+		break;
 	case 0x03:
-		return state->memory + state->bp + state->di + disp;
+		ret.ptr = state->memory + state->bp + state->di + disp;
+		break;
 	case 0x04:
-		return state->memory + state->si + disp;
+		ret.ptr = state->memory + state->si + disp;
+		break;
 	case 0x05:
-		return state->memory + state->di + disp;
+		ret.ptr = state->memory + state->di + disp;
+		break;
 	case 0x06:
-		return state->memory + state->bp + disp;
+		ret.ptr = state->memory + state->bp + disp;
+		break;
 	case 0x07:
-		return state->memory + state->bx + disp;
+		ret.ptr = state->memory + state->bx + disp;
+		break;
 	}
-	return NULL;
+	return ret;
 }
 
-void *get_operand(const instruction_t *inst, unsigned i, state_t *state)
+operand_t get_operand(const instruction_t *inst, unsigned i, state_t *state)
 {
-	void *ret = NULL;
+	operand_t ret;
 	unsigned imm_idx = 0;
 
 	switch (inst->mode[i]) {
@@ -83,21 +126,24 @@ void *get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		FALLTHROUGHT;
 	case IMM8:
 		imm_idx++;
-		ret = (void *)&state->binary[state->pc + state->parse_data.imm_idx];
+		ret.ptr = &state->binary[state->pc + state->parse_data.imm_idx];
+		ret.type = inst->mode[i] == IMM16 ? BIT16 : BIT8;
 		break;
 	case REL16:
 		imm_idx += 2;
 		state->parse_data.operand_holder[i] = state->pc
 				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
 				+ (int16_t)state->binary[state->pc + state->parse_data.imm_idx];
-		ret = &state->parse_data.operand_holder[i];
+		ret.ptr = &state->parse_data.operand_holder[i];
+		ret.type = BIT16;
 		break;
 	case REL8:
 		imm_idx++;
 		state->parse_data.operand_holder[i] = state->pc
 				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
 				+ (int8_t)state->binary[state->pc + state->parse_data.imm_idx];
-		ret = &state->parse_data.operand_holder[i];
+		ret.ptr = &state->parse_data.operand_holder[i];
+		ret.type = BIT8;
 		break;
 	case REG8:
 		ret = get_reg_operand(state, false, (state->binary[state->pc + 1] & 0b111000) >> 3);
@@ -176,9 +222,8 @@ void print_rm_value(state_t *state, instruction_t *inst)
 		if (mod == 0b11)
 			continue;
 
-		void *ptr = get_rm_operand(state, &imm, inst->mode[i] == R_M16);
-		uint16_t val = inst->mode[i] == R_M16 ? *(uint16_t *)ptr : *(uint8_t *)ptr;
-		printf(" ;[%04lx]%04x", (uint8_t *)ptr - state->memory, val);
+		operand_t operand = get_rm_operand(state, &imm, inst->mode[i] == R_M16);
+		printf(" ;[%04lx]%04x", operand.ptr - state->memory, read_op(operand));
 	}
 	printf("\n");
 }

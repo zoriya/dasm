@@ -4,5 +4,6 @@ pkgs.mkShell {
     gcc
     gnumake
     valgrind
+    gdb
   ];
 }
