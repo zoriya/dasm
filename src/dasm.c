@@ -129,7 +129,8 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 	}
 	if (last_param)
 		printf("%s", last_param + 2);
-	printf("\n");
+	if (space)
+		printf("\n");
 }
 
 unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size)

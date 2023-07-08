@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -163,6 +164,25 @@ void print_state(state_t *state)
 	);
 }
 
+void print_rm_value(state_t *state, instruction_t *inst)
+{
+	unsigned imm = 0;
+
+	for (int i = 0; inst->mode[i] != END; i++) {
+		if (inst->mode[i] != R_M8 && inst->mode[i] != R_M16)
+			continue;
+
+		unsigned mod = state->binary[state->pc + 1] >> 6;
+		if (mod == 0b11)
+			continue;
+
+		void *ptr = get_rm_operand(state, &imm, inst->mode[i] == R_M16);
+		uint16_t val = inst->mode[i] == R_M16 ? *(uint16_t *)ptr : *(uint8_t *)ptr;
+		printf(" ;[%04lx]%04x", (uint8_t *)ptr - state->memory, val);
+	}
+	printf("\n");
+}
+
 int interpret(u_int8_t *binary, unsigned long size)
 {
 	state_t *state = calloc(sizeof(*state), 1);
@@ -194,9 +214,10 @@ int interpret(u_int8_t *binary, unsigned long size)
 		if (state->pc + inst_size > size) {
 			return 0;
 		}
+		state->parse_data.imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
 		print_state(state);
 		print_instruction(state->pc, inst, inst_size, state->binary + state->pc, false);
-		state->parse_data.imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
+		print_rm_value(state, &inst);
 		if (inst.exec)
 			inst.exec(&inst, state);
 		else
