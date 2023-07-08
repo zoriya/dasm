@@ -72,12 +72,12 @@ const instruction_t instructions[] = {
 	{.opcode = 0x2D, .extended = -1, .name = "sub", .mode = {OPREG16, IMM16, END}, .exec = &sub},
 
 	{.opcode = 0x2F, .extended = -1, .name = "das", .mode = {END}, .exec = NULL},
-	{.opcode = 0x30, .extended = -1, .name = "xor", .mode = {R_M8, REG8, END}, .exec = NULL},
-	{.opcode = 0x31, .extended = -1, .name = "xor", .mode = {R_M16, REG16, END}, .exec = NULL},
-	{.opcode = 0x32, .extended = -1, .name = "xor", .mode = {REG8, R_M8, END}, .exec = NULL},
-	{.opcode = 0x33, .extended = -1, .name = "xor", .mode = {REG16, R_M16, END}, .exec = NULL},
-	{.opcode = 0x34, .extended = -1, .name = "xor", .mode = {OPREG8, IMM8, END}, .exec = NULL},
-	{.opcode = 0x35, .extended = -1, .name = "xor", .mode = {OPREG16, IMM16, END}, .exec = NULL},
+	{.opcode = 0x30, .extended = -1, .name = "xor", .mode = {R_M8, REG8, END}, .exec = &xor_inst},
+	{.opcode = 0x31, .extended = -1, .name = "xor", .mode = {R_M16, REG16, END}, .exec = &xor_inst},
+	{.opcode = 0x32, .extended = -1, .name = "xor", .mode = {REG8, R_M8, END}, .exec = &xor_inst},
+	{.opcode = 0x33, .extended = -1, .name = "xor", .mode = {REG16, R_M16, END}, .exec = &xor_inst},
+	{.opcode = 0x34, .extended = -1, .name = "xor", .mode = {OPREG8, IMM8, END}, .exec = &xor_inst},
+	{.opcode = 0x35, .extended = -1, .name = "xor", .mode = {OPREG16, IMM16, END}, .exec = &xor_inst},
 
 	{.opcode = 0x37, .extended = -1, .name = "aaa", .mode = {END}, .exec = NULL},
 	{.opcode = 0x38, .extended = -1, .name = "cmp", .mode = {R_M8, REG8, END}, .exec = NULL},
@@ -264,7 +264,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x03, .extended = -2, .name = "sbb", .mode = {R_M8, IMM8, END}, .exec = NULL},
 		{.opcode = 0x04, .extended = -2, .name = "and", .mode = {R_M8, IMM8, END}, .exec = NULL},
 		{.opcode = 0x05, .extended = -2, .name = "sub", .mode = {R_M8, IMM8, END}, .exec = &sub},
-		{.opcode = 0x06, .extended = -2, .name = "xor", .mode = {R_M8, IMM8, END}, .exec = NULL},
+		{.opcode = 0x06, .extended = -2, .name = "xor", .mode = {R_M8, IMM8, END}, .exec = &xor_inst},
 		{.opcode = 0x07, .extended = -2, .name = "cmp", .mode = {R_M8, IMM8, END}, .exec = NULL},
 	},
 	// 0x81 extended
@@ -275,7 +275,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x03, .extended = -2, .name = "sbb", .mode = {R_M16, IMM16, END}, .exec = NULL},
 		{.opcode = 0x04, .extended = -2, .name = "and", .mode = {R_M16, IMM16, END}, .exec = NULL},
 		{.opcode = 0x05, .extended = -2, .name = "sub", .mode = {R_M16, IMM16, END}, .exec = &sub},
-		{.opcode = 0x06, .extended = -2, .name = "xor", .mode = {R_M16, IMM16, END}, .exec = NULL},
+		{.opcode = 0x06, .extended = -2, .name = "xor", .mode = {R_M16, IMM16, END}, .exec = &xor_inst},
 		{.opcode = 0x07, .extended = -2, .name = "cmp", .mode = {R_M16, IMM16, END}, .exec = NULL},
 	},
 	// 0x83 extended

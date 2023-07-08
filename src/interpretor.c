@@ -68,6 +68,7 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 {
 	unsigned mod = state->binary[state->pc + 1] >> 6;
 	unsigned rm = state->binary[state->pc + 1] & 0b111;
+	unsigned disp = 0;
 
 	if (mod == 0b11)
 		return get_reg_operand(state, is16bit, rm);
@@ -79,11 +80,13 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 			.type = is16bit ? BIT16 : BIT8
 		};
 	}
-	unsigned disp = read_op((operand_t){
-		.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
-		.type = mod == 0b10 ? BIT16 : BIT8}
-	);
-	state->parse_data.imm_idx += mod == 0b10 ? 2 : 1;
+	if (mod == 0b10 || mod == 0b01) {
+		disp = read_op((operand_t){
+			.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
+			.type = mod == 0b10 ? BIT16 : BIT8}
+		);
+		state->parse_data.imm_idx += mod == 0b10 ? 2 : 1;
+	}
 
 	operand_t ret = {.ptr = NULL, .type = is16bit ? BIT16 : BIT8};
 	switch (rm) {
@@ -228,13 +231,65 @@ void print_rm_value(state_t *state, instruction_t *inst)
 	printf("\n");
 }
 
-int interpret(u_int8_t *binary, unsigned long size)
+void setup_env(state_t *state, int argc, char **args)
+{
+	char *env = "PATH=/usr:/usr/bin";
+	uint16_t env_head;
+	uint16_t args_size = argc;
+	uint16_t addr[args_size];
+
+	uint16_t len = strlen(env);
+	len++;
+
+	for (int i = 0; i < args_size; ++i) {
+		len += strlen(args[i]);
+		len++;
+	}
+
+	if (len % 2) state->memory[--state->sp] = 0;
+
+	state->memory[--state->sp] = '\0';
+	for (int i = (strlen(env) - 1); i >= 0; --i) {
+		state->memory[--state->sp] = env[i];
+	}
+	env_head = state->sp;
+
+	int addr_i = 0;
+	for (int i = args_size - 1; i >= 0; --i) {
+		state->memory[--state->sp] = '\0';
+		for (int j = strlen(args[i]) - 1; j >= 0; --j) {
+			state->memory[--state->sp] = args[i][j];
+		}
+		addr[addr_i++] = state->sp;
+	}
+
+	// Delimiter between char and env pointer
+	state->memory[--state->sp] = 0;
+	state->memory[--state->sp] = 0;
+
+	// add env address
+	state->memory[--state->sp] = env_head >> 8;
+	state->memory[--state->sp] = env_head;
+
+	// Delimiter between char and env pointer
+	state->memory[--state->sp] = 0;
+	state->memory[--state->sp] = 0;
+
+	// add args address
+	for (int i = 0; i < args_size; ++i) {
+		state->memory[--state->sp] = addr[i] >> 8;
+		state->memory[--state->sp] = addr[i];
+	}
+
+	state->memory[--state->sp] = args_size >> 8;
+	state->memory[--state->sp] = args_size;
+}
+
+int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv)
 {
 	state_t *state = calloc(sizeof(*state), 1);
 	int header_size = 0;
 	int dsize= 0;
-
-	state->sp = 0xFFC0;
 
 	if (binary[0] == 0xEB && binary[1] == 0x0E) {
 		header_size = 16;
@@ -251,6 +306,7 @@ int interpret(u_int8_t *binary, unsigned long size)
 	state->binary_size = size;
 
 	memcpy(state->memory, binary + size, dsize);
+	setup_env(state, argc, argv);
 
 	printf(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n");
 	while (state->pc < size) {
