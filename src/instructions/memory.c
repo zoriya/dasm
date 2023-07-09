@@ -74,3 +74,12 @@ void int_inst(const instruction_t *self, state_t *state)
 		break;
 	}
 }
+
+void lea(const instruction_t *self, state_t *state)
+{
+	operand_t to = get_operand(self, 0, state);
+	operand_t memory = get_operand(self, 1, state);
+
+	// to = &memory;
+	write_op(to, memory.ptr - state->memory);
+}

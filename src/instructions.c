@@ -149,7 +149,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x8A, .extended = -1, .name = "mov", .mode = {REG8, R_M8, END}, .exec = &mov},
 	{.opcode = 0x8B, .extended = -1, .name = "mov", .mode = {REG16, R_M16, END}, .exec = &mov},
 	// {.opcode = 0x8C, .extended = -1, .name = "mov", .mode = {R_M16, sreg, END}, .exec = &mov},
-	{.opcode = 0x8D, .extended = -1, .name = "lea", .mode = {REG16, R_M16, END}, .exec = NULL},
+	{.opcode = 0x8D, .extended = -1, .name = "lea", .mode = {REG16, R_M16, END}, .exec = &lea},
 	// {.opcode = 0x8E, .extended = -1, .name = "mov", .mode = {sreg, R_M16, END}, .exec = &mov},
 	{.opcode = 0x8F, .extended = -1, .name = "pop", .mode = {R_M16, END}, .exec = NULL},
 	{.opcode = 0x90, .extended = -1, .name = "xchg ax, ax", .mode = {END}, .exec = NULL},

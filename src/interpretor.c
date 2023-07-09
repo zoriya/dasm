@@ -85,7 +85,7 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 			.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
 			.type = mod == 0b10 ? BIT16 : BIT8}
 		);
-		state->parse_data.imm_idx += mod == 0b10 ? 2 : 1;
+		*imm_idx += mod == 0b10 ? 2 : 1;
 	}
 
 	operand_t ret = {.ptr = NULL, .type = is16bit ? BIT16 : BIT8};
