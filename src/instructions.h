@@ -10,5 +10,6 @@ void jmp(const instruction_t *self, state_t *state);
 void int_inst(const instruction_t *self, state_t *state);
 void lea(const instruction_t *self, state_t *state);
 
+void add(const instruction_t *self, state_t *state);
 void sub(const instruction_t *self, state_t *state);
 void xor_inst(const instruction_t *self, state_t *state);
