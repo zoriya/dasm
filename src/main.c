@@ -33,8 +33,8 @@ unsigned long open_and_read(char *path, u_int8_t **out)
 
 int main(int argc, char **argv)
 {
-	if (argc < 3 || (strcmp(argv[1], "-d") && strcmp(argv[1], "-i"))) {
-		printf("Usage:\n\tTo disassemble: %s -d <binary>\n\tTo interpret: %s -i <binary>\n", argv[0], argv[0]);
+	if (argc < 3 || (strcmp(argv[1], "-d") && strcmp(argv[1], "-i") && strcmp(argv[1], "-m"))) {
+		printf("Usage:\n\tTo disassemble: %s -d <binary>\n\tTo interpret: %s -i <binary> or %s -m <binary> for debug mode\n", argv[0], argv[0], argv[0]);
 		return 2;
 	}
 
@@ -50,7 +50,11 @@ int main(int argc, char **argv)
 		return 2;
 	}
 
-	int ret = strcmp(argv[1], "-i") ? dasm(binary, size) : interpret(binary, size, argc - 2, argv + 2);
+	int ret;
+	if (!strcmp(argv[1], "-d"))
+		ret = dasm(binary, size);
+	else
+		ret = interpret(binary, size, argc - 2, argv + 2, !strcmp(argv[1], "-m"));
 	free(binary);
 	return ret;
 }

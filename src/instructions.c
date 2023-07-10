@@ -160,7 +160,7 @@ const instruction_t instructions[] = {
 	{.opcode = 0x95, .extended = -1, .name = "xchg bp, ax", .mode = {END}, .exec = NULL},
 	{.opcode = 0x96, .extended = -1, .name = "xchg si, ax", .mode = {END}, .exec = NULL},
 	{.opcode = 0x97, .extended = -1, .name = "xchg di, ax", .mode = {END}, .exec = NULL},
-	{.opcode = 0x98, .extended = -1, .name = "cbw", .mode = {END}, .exec = NULL},
+	{.opcode = 0x98, .extended = -1, .name = "cbw", .mode = {END}, .exec = &cbw},
 	{.opcode = 0x99, .extended = -1, .name = "cwd", .mode = {END}, .exec = NULL},
 	// {.opcode = 0x9A, .extended = -1, .name = "call", .mode = {CALL_INTER, END}, .exec = &call},
 	{.opcode = 0x9B, .extended = -1, .name = "wait", .mode = {END}, .exec = NULL},

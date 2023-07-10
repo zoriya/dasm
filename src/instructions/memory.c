@@ -204,10 +204,12 @@ void int_inst(const instruction_t *self, state_t *state)
 
 	switch (syscall->type) {
 	case 0x1:
-		printf("<exit(%d)>\n", *args);
+		if (state->parse_data.debug)
+			printf("<exit(%d)>\n", *args);
 		exit(*args);
 	case 0x2:
-		printf("<fork() => %d>\n", 0);
+		if (state->parse_data.debug)
+			printf("<fork() => %d>\n", 0);
 		printf("Not implemented\n");
 		break;
 	case 0x4: {
@@ -215,10 +217,12 @@ void int_inst(const instruction_t *self, state_t *state)
 		uint16_t len = *((uint16_t *)args + 1);
 		// the 2 args (a number is skiped.)
 		uint16_t addr = *((uint16_t *)args + 3);
-		printf("<write(%d, 0x%04x, %d)", fd, addr, len);
+		if (state->parse_data.debug)
+			printf("<write(%d, 0x%04x, %d)", fd, addr, len);
 		fflush(stdout);
 		int ret = write(fd, &state->memory[addr], len);
-		printf(" => %d>\n", ret);
+		if (state->parse_data.debug)
+			printf(" => %d>\n", ret);
 		syscall->type = ret;
 		state->ax = 0;
 		break;

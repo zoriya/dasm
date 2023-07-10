@@ -7,7 +7,7 @@
 #define FALLTHROUGHT __attribute__((fallthrough));
 
 int dasm(u_int8_t *binary, unsigned long size);
-int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv);
+int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv, bool debug_mode);
 
 // typedef enum addressing_mode {
 // 	/// Param is the data (MOV AL, ~68FE~)

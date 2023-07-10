@@ -233,7 +233,7 @@ void print_rm_value(state_t *state, instruction_t *inst)
 			continue;
 
 		operand_t operand = get_rm_operand(state, &imm, inst->mode[i] == R_M16);
-		printf(" ;[%04lx]%04x", operand.ptr - state->memory, read_op(operand));
+		printf(" ;[%04lx]%0*x", operand.ptr - state->memory, operand.type == BIT8 ? 2 : 4, read_op(operand));
 	}
 	printf("\n");
 }
@@ -292,7 +292,7 @@ void setup_env(state_t *state, int argc, char **args)
 	state->memory[--state->sp] = args_size;
 }
 
-int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv)
+int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv, bool debug_mode)
 {
 	state_t *state = calloc(sizeof(*state), 1);
 	int header_size = 0;
@@ -311,11 +311,13 @@ int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv)
 	binary += header_size;
 	state->binary = binary;
 	state->binary_size = size;
+	state->parse_data.debug = debug_mode;
 
 	memcpy(state->memory, binary + size, dsize);
 	setup_env(state, argc, argv);
 
-	printf(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n");
+	if (state->parse_data.debug)
+		printf(" AX   BX   CX   DX   SP   BP   SI   DI  FLAGS IP\n");
 	while (state->pc < size) {
 		instruction_t inst = parse_inst(state->binary + state->pc, size - state->pc);
 		unsigned inst_size = get_inst_size(inst, state->binary + state->pc, size - state->pc);
@@ -323,9 +325,11 @@ int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv)
 			return 0;
 		}
 		state->parse_data.imm_idx = 1 + (inst.extended != -1 || has_reg(&inst));
-		print_state(state);
-		print_instruction(state->pc, inst, inst_size, state->binary + state->pc, false);
-		print_rm_value(state, &inst);
+		if (state->parse_data.debug) {
+			print_state(state);
+			print_instruction(state->pc, inst, inst_size, state->binary + state->pc, false);
+			print_rm_value(state, &inst);
+		}
 		unsigned old_pc = state->pc;
 
 		if (inst.exec)

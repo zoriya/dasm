@@ -117,3 +117,8 @@ void dec(const instruction_t *self, state_t *state)
 	state->zf = value == 0;
 	// TODO: Set AF and PF
 }
+
+void cbw(const instruction_t *self, state_t *state)
+{
+	state->ah = state->al >> 0x7 & 1 ? 0xFF : 0;
+}

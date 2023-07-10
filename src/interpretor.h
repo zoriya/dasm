@@ -8,29 +8,29 @@
 typedef struct state {
 	union {
 		struct {
-			uint8_t ah;
 			uint8_t al;
+			uint8_t ah;
 		};
 		uint16_t ax;
 	};
 	union {
 		struct {
-			uint8_t bh;
 			uint8_t bl;
+			uint8_t bh;
 		};
 		uint16_t bx;
 	};
 	union {
 		struct {
-			uint8_t ch;
 			uint8_t cl;
+			uint8_t ch;
 		};
 		uint16_t cx;
 	};
 	union {
 		struct {
-			uint8_t dh;
 			uint8_t dl;
+			uint8_t dh;
 		};
 		uint16_t dx;
 	};
@@ -66,6 +66,7 @@ typedef struct state {
 		// A bunch of unsigneds to store temporary operands and return them as pointers.
 		// instructions can't write to it, they are effectivly read-only.
 		uint16_t operand_holder[5];
+		bool debug;
 	} parse_data;
 } state_t;
 
