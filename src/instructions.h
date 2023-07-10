@@ -32,6 +32,7 @@ void lea(const instruction_t *self, state_t *state);
 
 void add(const instruction_t *self, state_t *state);
 void sub(const instruction_t *self, state_t *state);
+void or_inst(const instruction_t *self, state_t *state);
 void xor_inst(const instruction_t *self, state_t *state);
 void cmp(const instruction_t *self, state_t *state);
 void test(const instruction_t *self, state_t *state);

@@ -32,12 +32,12 @@ const instruction_t instructions[] = {
 	{.opcode = 0x05, .extended = -1, .name = "add", .mode = {OPREG16, IMM16, END}, .exec = &add},
 	{.opcode = 0x06, .extended = -1, .name = "push es", .mode = {END}, .exec = &push},
 	{.opcode = 0x07, .extended = -1, .name = "pop es", .mode = {END}, .exec = &pop},
-	{.opcode = 0x08, .extended = -1, .name = "or", .mode = {R_M8, REG8, END}, .exec = NULL},
-	{.opcode = 0x09, .extended = -1, .name = "or", .mode = {R_M16, REG16, END}, .exec = NULL},
-	{.opcode = 0x0A, .extended = -1, .name = "or", .mode = {REG8, R_M8, END}, .exec = NULL},
-	{.opcode = 0x0B, .extended = -1, .name = "or", .mode = {REG16, R_M16, END}, .exec = NULL},
-	{.opcode = 0x0C, .extended = -1, .name = "or", .mode = {OPREG8, IMM8, END}, .exec = NULL},
-	{.opcode = 0x0D, .extended = -1, .name = "or", .mode = {OPREG16, IMM16, END}, .exec = NULL},
+	{.opcode = 0x08, .extended = -1, .name = "or", .mode = {R_M8, REG8, END}, .exec = &or_inst},
+	{.opcode = 0x09, .extended = -1, .name = "or", .mode = {R_M16, REG16, END}, .exec = &or_inst},
+	{.opcode = 0x0A, .extended = -1, .name = "or", .mode = {REG8, R_M8, END}, .exec = &or_inst},
+	{.opcode = 0x0B, .extended = -1, .name = "or", .mode = {REG16, R_M16, END}, .exec = &or_inst},
+	{.opcode = 0x0C, .extended = -1, .name = "or", .mode = {OPREG8, IMM8, END}, .exec = &or_inst},
+	{.opcode = 0x0D, .extended = -1, .name = "or", .mode = {OPREG16, IMM16, END}, .exec = &or_inst},
 	{.opcode = 0x0E, .extended = -1, .name = "push cs", .mode = {END}, .exec = &push},
 
 	{.opcode = 0x10, .extended = -1, .name = "adc", .mode = {R_M8, REG8, END}, .exec = NULL},
@@ -259,7 +259,7 @@ const instruction_t extended[][8] = {
 	// 0x80 extended
 	{
 		{.opcode = 0x00, .extended = -2, .name = "add", .mode = {R_M8, IMM8, END}, .exec = &add},
-		{.opcode = 0x01, .extended = -2, .name = "or", .mode = {R_M8, IMM8, END}, .exec = NULL},
+		{.opcode = 0x01, .extended = -2, .name = "or", .mode = {R_M8, IMM8, END}, .exec = &or_inst},
 		{.opcode = 0x02, .extended = -2, .name = "adc", .mode = {R_M8, IMM8, END}, .exec = NULL},
 		{.opcode = 0x03, .extended = -2, .name = "sbb", .mode = {R_M8, IMM8, END}, .exec = NULL},
 		{.opcode = 0x04, .extended = -2, .name = "and", .mode = {R_M8, IMM8, END}, .exec = NULL},
@@ -270,7 +270,7 @@ const instruction_t extended[][8] = {
 	// 0x81 extended
 	{
 		{.opcode = 0x00, .extended = -2, .name = "add", .mode = {R_M16, IMM16, END}, .exec = &add},
-		{.opcode = 0x01, .extended = -2, .name = "or", .mode = {R_M16, IMM16, END}, .exec = NULL},
+		{.opcode = 0x01, .extended = -2, .name = "or", .mode = {R_M16, IMM16, END}, .exec = &or_inst},
 		{.opcode = 0x02, .extended = -2, .name = "adc", .mode = {R_M16, IMM16, END}, .exec = NULL},
 		{.opcode = 0x03, .extended = -2, .name = "sbb", .mode = {R_M16, IMM16, END}, .exec = NULL},
 		{.opcode = 0x04, .extended = -2, .name = "and", .mode = {R_M16, IMM16, END}, .exec = NULL},
