@@ -326,11 +326,14 @@ int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv)
 		print_state(state);
 		print_instruction(state->pc, inst, inst_size, state->binary + state->pc, false);
 		print_rm_value(state, &inst);
+		unsigned old_pc = state->pc;
+
 		if (inst.exec)
 			inst.exec(&inst, state);
 		else
 			printf("Not implemented.\n");
-		state->pc += inst_size;
+		if (state->pc == old_pc)
+			state->pc += inst_size;
 	}
 	return 0;
 }

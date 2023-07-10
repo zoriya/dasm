@@ -40,10 +40,10 @@ void call(const instruction_t *self, state_t *state)
 	uint16_t pc = read_op(get_operand(self, 0, state));
 	unsigned inst_size = get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 
-	state->pc += inst_size - 1;
+	state->pc += inst_size;
 	state->memory[--state->sp] = state->pc >> 8;
 	state->memory[--state->sp] = state->pc & 0xFF;
-	state->pc = pc - inst_size;
+	state->pc = pc;
 }
 
 void ret(const instruction_t *self, state_t *state)
@@ -62,135 +62,135 @@ void jmp(const instruction_t *self, state_t *state)
 {
 	uint16_t pc = read_op(get_operand(self, 0, state));
 
-	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+	state->pc = pc;
 }
 
 void jo(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jno(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jb(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->cf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jnb(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->cf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void je(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->zf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc += pc;
 }
 
 void jne(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->zf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jbe(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->cf || state->zf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jnbe(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->cf && !state->zf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void js(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->sf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jns(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->sf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jpe(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->pf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jpo(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->pf)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jl(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->sf != state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jnl_inst(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->sf == state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jng(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->zf || state->sf != state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void jg(const instruction_t *self, state_t *state)
 {
-	int8_t diff = read_op(get_operand(self, 0, state));
+	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (!state->zf && state->sf == state->of)
-		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+		state->pc = pc;
 }
 
 void int_inst(const instruction_t *self, state_t *state)
