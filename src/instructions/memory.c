@@ -102,7 +102,7 @@ void je(const instruction_t *self, state_t *state)
 	uint16_t pc = read_op(get_operand(self, 0, state));
 
 	if (state->zf)
-		state->pc += pc;
+		state->pc = pc;
 }
 
 void jne(const instruction_t *self, state_t *state)
@@ -219,6 +219,7 @@ void int_inst(const instruction_t *self, state_t *state)
 		fflush(stdout);
 		int ret = write(fd, &state->memory[addr], len);
 		printf(" => %d>\n", ret);
+		syscall->type = ret;
 		state->ax = 0;
 		break;
 	}
