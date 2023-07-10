@@ -20,16 +20,16 @@ void push(const instruction_t *self, state_t *state)
 	unsigned what = read_op(get_operand(self, 0, state));
 
 	if (is_operand_wide(self, 0))
-		state->memory[state->sp--] = what >> 8;
-	state->memory[state->sp--] = what & 0xFF;
+		state->memory[--state->sp] = what >> 8;
+	state->memory[--state->sp] = what & 0xFF;
 }
 
 void call(const instruction_t *self, state_t *state)
 {
 	uint16_t pc = read_op(get_operand(self, 0, state));
 
-	state->memory[state->sp--] = state->pc >> 8;
-	state->memory[state->sp--] = state->pc & 0xFF;
+	state->memory[--state->sp] = state->pc >> 8;
+	state->memory[--state->sp] = state->pc & 0xFF;
 	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 }
 

@@ -68,7 +68,7 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 {
 	unsigned mod = state->binary[state->pc + 1] >> 6;
 	unsigned rm = state->binary[state->pc + 1] & 0b111;
-	unsigned disp = 0;
+	int disp = 0;
 
 	if (mod == 0b11)
 		return get_reg_operand(state, is16bit, rm);
@@ -80,12 +80,19 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 			.type = is16bit ? BIT16 : BIT8
 		};
 	}
-	if (mod == 0b10 || mod == 0b01) {
+	if (mod == 0b10) {
 		disp = read_op((operand_t){
 			.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
-			.type = mod == 0b10 ? BIT16 : BIT8}
-		);
-		*imm_idx += mod == 0b10 ? 2 : 1;
+			.type = BIT16
+		});
+		*imm_idx += 2;
+	}
+	if (mod == 0b01) {
+		disp = (int8_t)read_op((operand_t){
+			.ptr = &state->binary[state->pc + state->parse_data.imm_idx],
+			.type = BIT8
+		});
+		*imm_idx += 1;
 	}
 
 	operand_t ret = {.ptr = NULL, .type = is16bit ? BIT16 : BIT8};
@@ -136,8 +143,8 @@ operand_t get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		imm_idx += 2;
 		state->parse_data.operand_holder[i] = state->pc
 				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
-				+ (int16_t)state->binary[state->pc + state->parse_data.imm_idx];
-		ret.ptr = &state->parse_data.operand_holder[i];
+				+ (int16_t)((state->binary[state->pc + state->parse_data.imm_idx + 1] << 8) | state->binary[state->pc + state->parse_data.imm_idx]);
+		ret.ptr = (uint8_t *)&state->parse_data.operand_holder[i];
 		ret.type = BIT16;
 		break;
 	case REL8:
@@ -145,8 +152,8 @@ operand_t get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		state->parse_data.operand_holder[i] = state->pc
 				+ get_inst_size(*inst, state->binary + state->pc, state->binary_size - state->pc)
 				+ (int8_t)state->binary[state->pc + state->parse_data.imm_idx];
-		ret.ptr = &state->parse_data.operand_holder[i];
-		ret.type = BIT8;
+		ret.ptr = (uint8_t *)&state->parse_data.operand_holder[i];
+		ret.type = BIT16;
 		break;
 	case REG8:
 		ret = get_reg_operand(state, false, (state->binary[state->pc + 1] & 0b111000) >> 3);
