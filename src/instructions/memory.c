@@ -40,6 +40,134 @@ void jmp(const instruction_t *self, state_t *state)
 	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 }
 
+void jo(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jno(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jb(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->cf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jnb(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->cf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void je(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->zf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jne(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->zf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jbe(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->cf || state->zf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jnbe(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->cf && !state->zf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void js(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->sf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jns(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->sf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jpe(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->pf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jpo(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->pf)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jl(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->sf != state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jnl_inst(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->sf == state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jng(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (state->zf || state->sf != state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
+void jg(const instruction_t *self, state_t *state)
+{
+	int8_t diff = read_op(get_operand(self, 0, state));
+
+	if (!state->zf && state->sf == state->of)
+		state->pc += diff - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+}
+
 void int_inst(const instruction_t *self, state_t *state)
 {
 	// I have no clue what the use of type is.
