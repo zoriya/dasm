@@ -5,8 +5,10 @@
 
 void mov(const instruction_t *self, state_t *state);
 void push(const instruction_t *self, state_t *state);
+void pop(const instruction_t *self, state_t *state);
 
 void call(const instruction_t *self, state_t *state);
+void ret(const instruction_t *self, state_t *state);
 void jmp(const instruction_t *self, state_t *state);
 void jo(const instruction_t *self, state_t *state);
 void jno(const instruction_t *self, state_t *state);

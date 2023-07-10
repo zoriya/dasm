@@ -24,13 +24,38 @@ void push(const instruction_t *self, state_t *state)
 	state->memory[--state->sp] = what & 0xFF;
 }
 
+void pop(const instruction_t *self, state_t *state)
+{
+	operand_t where = get_operand(self, 0, state);
+	unsigned what = 0;
+
+	what |= state->memory[state->sp++];
+	if (is_operand_wide(self, 0))
+		what |= state->memory[state->sp++] << 8;
+	write_op(where, what);
+}
+
 void call(const instruction_t *self, state_t *state)
 {
 	uint16_t pc = read_op(get_operand(self, 0, state));
+	unsigned inst_size = get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
 
+	state->pc += inst_size - 1;
 	state->memory[--state->sp] = state->pc >> 8;
 	state->memory[--state->sp] = state->pc & 0xFF;
-	state->pc = pc - get_inst_size(*self, state->binary + state->pc, state->binary_size - state->pc);
+	state->pc = pc - inst_size;
+}
+
+void ret(const instruction_t *self, state_t *state)
+{
+	uint16_t spmin = self->mode[0] != END ? read_op(get_operand(self, 0, state)) : 0;
+	unsigned what = 0;
+
+	what |= state->memory[state->sp++];
+	if (is_operand_wide(self, 0))
+		what |= state->memory[state->sp++] << 8;
+	state->pc = what;
+	state->sp += spmin;
 }
 
 void jmp(const instruction_t *self, state_t *state)
