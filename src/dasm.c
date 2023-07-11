@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "dasm.h"
+#include "instructions.h"
 
 const char *registers8[] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
 const char *registers16[] = { "ax", "cx", "dx", "bx", "sp", "bp", "si", "di" };
@@ -83,6 +84,23 @@ bool has_reg(const instruction_t *inst)
 	return false;
 }
 
+bool is_byte_operand(const instruction_t *inst, uint8_t *binary)
+{
+	if (inst->exec != &test || is_operand_wide(inst, 0))
+		return false;
+	for (int i = 0; inst->mode[i] != END; i++) {
+		if (inst->mode[i] == REG8 || inst->mode[i] == REG16)
+			return false;
+		if (
+			(inst->mode[i] == R_M8 || inst->mode[i] == R_M16)
+			&& binary[1] >> 6 == 0b11
+		)
+			return false;
+
+	}
+	return true;
+}
+
 void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_int8_t *binary, bool space)
 {
 	char *last_param = strchr(inst.name, '%');
@@ -96,6 +114,9 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 		printf("%.*s", (int)(last_param - inst.name - 1), inst.name);
 	else
 		printf("%s", inst.name);
+	if (is_byte_operand(&inst, binary)) {
+		printf(" byte");
+	}
 
 	for (int i = 0; inst.mode[i] != END; i++) {
 		if (need_comma)

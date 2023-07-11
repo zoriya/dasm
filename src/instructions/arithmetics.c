@@ -104,6 +104,20 @@ void test(const instruction_t *self, state_t *state)
 	// TODO: Set PF
 }
 
+void inc(const instruction_t *self, state_t *state)
+{
+	operand_t from = get_operand(self, 0, state);
+	unsigned value = read_op(from) + 1;
+
+	write_op(from, value);
+
+	// FIXME: of should be set to value != read_op(from);
+	state->of = 0;
+	state->sf = value & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
+	state->zf = value == 0;
+	// TODO: Set AF and PF
+}
+
 void dec(const instruction_t *self, state_t *state)
 {
 	operand_t from = get_operand(self, 0, state);
@@ -120,5 +134,6 @@ void dec(const instruction_t *self, state_t *state)
 
 void cbw(const instruction_t *self, state_t *state)
 {
+	(void)self;
 	state->ah = state->al >> 0x7 & 1 ? 0xFF : 0;
 }

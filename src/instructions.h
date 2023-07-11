@@ -36,5 +36,6 @@ void or_inst(const instruction_t *self, state_t *state);
 void xor_inst(const instruction_t *self, state_t *state);
 void cmp(const instruction_t *self, state_t *state);
 void test(const instruction_t *self, state_t *state);
+void inc(const instruction_t *self, state_t *state);
 void dec(const instruction_t *self, state_t *state);
 void cbw(const instruction_t *self, state_t *state);
