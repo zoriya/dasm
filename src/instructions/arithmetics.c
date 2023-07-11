@@ -201,8 +201,31 @@ void shl(const instruction_t *self, state_t *state)
 
 	write_op(to, new);
 
-	state->cf = value >> (8 - shft);
+	state->of = new != read_op(to);
+	state->cf = value >> (8 - shft) & 1;
 	state->sf = new & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
+	state->zf = new == 0;
+}
+
+void sar(const instruction_t *self, state_t *state)
+{
+	operand_t to = get_operand(self, 0, state);
+	unsigned value = read_op(to);
+	uint8_t opgrp =state->binary[state->pc];
+	unsigned shft = (opgrp == 0xd0 || opgrp == 0xd1) ? 1 : state->cl;
+
+	unsigned signMask = (is_operand_wide(self, 0) ? 0x8000 : 0x80);
+
+	unsigned new = value >> shft;
+	if (value & signMask)
+		new |= signMask;
+	else
+		new &= ~signMask;
+
+	write_op(to, new);
+
+	state->cf = (value >> (shft - 1)) & 1;
+	state->sf = value & signMask;
 	state->zf = new == 0;
 }
 

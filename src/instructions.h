@@ -44,4 +44,5 @@ void cbw(const instruction_t *self, state_t *state);
 void cwd(const instruction_t *self, state_t *state);
 void neg(const instruction_t *self, state_t *state);
 void shl(const instruction_t *self, state_t *state);
+void sar(const instruction_t *self, state_t *state);
 void xchg(const instruction_t *self, state_t *state);

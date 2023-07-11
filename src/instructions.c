@@ -343,7 +343,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x04, .extended = -2, .name = "shl %s, 1", .mode = {R_M8, END}, .exec = &shl},
 		{.opcode = 0x05, .extended = -2, .name = "shr %s, 1", .mode = {R_M8, END}, .exec = NULL},
 		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}, .exec = NULL},
-		{.opcode = 0x07, .extended = -2, .name = "sar %s, 1", .mode = {R_M8, END}, .exec = NULL},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s, 1", .mode = {R_M8, END}, .exec = &sar},
 	},
 	// 0xd1 extended
 	{
@@ -354,7 +354,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x04, .extended = -2, .name = "shl %s, 1", .mode = {R_M16, END}, .exec = &shl},
 		{.opcode = 0x05, .extended = -2, .name = "shr %s, 1", .mode = {R_M16, END}, .exec = NULL},
 		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}, .exec = NULL},
-		{.opcode = 0x07, .extended = -2, .name = "sar %s, 1", .mode = {R_M16, END}, .exec = NULL},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s, 1", .mode = {R_M16, END}, .exec = &sar},
 	},
 	// 0xd2 extended
 	{
@@ -365,7 +365,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x04, .extended = -2, .name = "shl %s, cl", .mode = {R_M8, END}, .exec = &shl},
 		{.opcode = 0x05, .extended = -2, .name = "shr %s, cl", .mode = {R_M8, END}, .exec = NULL},
 		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}, .exec = NULL},
-		{.opcode = 0x07, .extended = -2, .name = "sar %s, cl", .mode = {R_M8, END}, .exec = NULL},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s, cl", .mode = {R_M8, END}, .exec = &sar},
 	},
 	// 0xd3 extended
 	{
@@ -376,7 +376,7 @@ const instruction_t extended[][8] = {
 		{.opcode = 0x04, .extended = -2, .name = "shl %s, cl", .mode = {R_M16, END}, .exec = &shl},
 		{.opcode = 0x05, .extended = -2, .name = "shr %s, cl", .mode = {R_M16, END}, .exec = NULL},
 		/**/{.opcode = 0x06, .extended = -2, .name = "invalid", .mode = {END}, .exec = NULL},
-		{.opcode = 0x07, .extended = -2, .name = "sar %s, cl", .mode = {R_M16, END}, .exec = NULL},
+		{.opcode = 0x07, .extended = -2, .name = "sar %s, cl", .mode = {R_M16, END}, .exec = &sar},
 	},
 };
 
