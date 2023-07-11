@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
 #include "../dasm.h"
 #include "../interpretor.h"
 
@@ -202,6 +203,8 @@ void int_inst(const instruction_t *self, state_t *state)
 
 	(void)self;
 
+	state->ax = 0;
+
 	switch (syscall->type) {
 	case 0x1:
 		if (state->parse_data.debug)
@@ -224,7 +227,16 @@ void int_inst(const instruction_t *self, state_t *state)
 		if (state->parse_data.debug)
 			printf(" => %d>\n", ret);
 		syscall->type = ret;
-		state->ax = 0;
+		break;
+	}
+	case 0x36: {
+		uint16_t fd = *(uint16_t *)args;
+		uint16_t addr = *((uint16_t *)args + 2);
+		uint16_t addr2 = *((uint16_t *)args + 7);
+		if (state->parse_data.debug)
+			printf("<ioctl(%d, 0x%04x, 0x%04x)>\n", fd, addr, addr2);
+		int16_t ret = -EINVAL;
+		syscall->type = ret;
 		break;
 	}
 	default:
