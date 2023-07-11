@@ -64,8 +64,21 @@ unsigned long read_size(u_int8_t *binary, unsigned size)
 bool has_reg(const instruction_t *inst)
 {
 	for (int i = 0; inst->mode[i] != END; i++) {
-		if (inst->mode[i] == REG8 || inst->mode[i] == REG16)
+		switch (inst->mode[i]) {
+		case REG8:
+		case REG16:
+		case R_M8:
+		case R_M16:
 			return true;
+		case OPREG8:
+		case OPREG16:
+		case IMM8:
+		case IMM16:
+		case REL8:
+		case REL16:
+		case END:
+			continue;
+		}
 	}
 	return false;
 }
