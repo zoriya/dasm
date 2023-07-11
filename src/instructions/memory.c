@@ -236,10 +236,12 @@ void int_inst(const instruction_t *self, state_t *state)
 		uint16_t ret;
 		if (addr < state->data_size || (addr >= ((state->sp & ~0x3ff) - 0x400))) {
 			ret = -ENOMEM;
-			printf(" => ENOMEM>\n");
+			if (state->parse_data.debug)
+				printf(" => ENOMEM>\n");
 		} else {
 			ret = 0;
-			printf(" => 0>\n");
+			if (state->parse_data.debug)
+				printf(" => 0>\n");
 		}
 		*((uint16_t *)args + 7) = addr;
 		syscall->type = ret;

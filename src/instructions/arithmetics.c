@@ -166,3 +166,18 @@ void neg(const instruction_t *self, state_t *state)
 	state->sf = value & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
 	state->zf = value == 0;
 }
+
+void shl(const instruction_t *self, state_t *state)
+{
+	operand_t to = get_operand(self, 0, state);
+	unsigned value = read_op(to);
+	uint8_t opgrp =state->binary[state->pc];
+	unsigned shft = (opgrp == 0xd0 || opgrp == 0xd1) ? 1 : state->cl;
+	unsigned new = value << shft;
+
+	write_op(to, new);
+
+	state->cf = value >> (8 - shft);
+	state->sf = new & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
+	state->zf = new == 0;
+}
