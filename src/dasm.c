@@ -29,7 +29,8 @@ int print_rm_operand(u_int8_t *binary, int imm_idx, bool is16bit)
 	int imm_offset = 0;
 
 	if (mod == 0b10) {
-		snprintf(disp, sizeof(disp), "+%x", (binary[imm_idx + 1] << 8) | binary[imm_idx]);
+		int16_t disp_v = (binary[imm_idx + 1] << 8) | binary[imm_idx];
+		snprintf(disp, sizeof(disp), "%c%x", disp_v < 0 ? '-' : '+', disp_v < 0 ? -disp_v : disp_v);
 		imm_offset += 2;
 	}
 	if (mod == 0b01) {
@@ -88,7 +89,9 @@ bool has_reg(const instruction_t *inst)
 
 bool is_byte_operand(const instruction_t *inst, uint8_t *binary)
 {
-	if (inst->exec != &test || is_operand_wide(inst, 0))
+	if (inst->exec != &test  && inst->exec != &cmp)
+		return false;
+	if (is_operand_wide(inst, 0))
 		return false;
 	for (int i = 0; inst->mode[i] != END; i++) {
 		if (inst->mode[i] == REG8 || inst->mode[i] == REG16)

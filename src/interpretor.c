@@ -99,32 +99,34 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 	}
 
 	operand_t ret = {.ptr = NULL, .type = is16bit ? BIT16 : BIT8};
+	uint16_t offset;
 	switch (rm) {
 	case 0x00:
-		ret.ptr = state->memory + state->bx + state->si + disp;
+		offset = state->bx + state->si + disp;
 		break;
 	case 0x01:
-		ret.ptr = state->memory + state->bx + state->di + disp;
+		offset =+ state->bx + state->di + disp;
 		break;
 	case 0x02:
-		ret.ptr = state->memory + state->bp + state->si + disp;
+		offset =+ state->bp + state->si + disp;
 		break;
 	case 0x03:
-		ret.ptr = state->memory + state->bp + state->di + disp;
+		offset =+ state->bp + state->di + disp;
 		break;
 	case 0x04:
-		ret.ptr = state->memory + state->si + disp;
+		offset =+ state->si + disp;
 		break;
 	case 0x05:
-		ret.ptr = state->memory + state->di + disp;
+		offset =+ state->di + disp;
 		break;
 	case 0x06:
-		ret.ptr = state->memory + state->bp + disp;
+		offset =+ state->bp + disp;
 		break;
 	case 0x07:
-		ret.ptr = state->memory + state->bx + disp;
+		offset =+ state->bx + disp;
 		break;
 	}
+	ret.ptr = state->memory + offset;
 	return ret;
 }
 

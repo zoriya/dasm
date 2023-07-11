@@ -68,8 +68,8 @@ const instruction_t instructions[] = {
 	{.opcode = 0x29, .extended = -1, .name = "sub", .mode = {R_M16, REG16, END}, .exec = &sub},
 	{.opcode = 0x2A, .extended = -1, .name = "sub", .mode = {REG8, R_M8, END}, .exec = &sub},
 	{.opcode = 0x2B, .extended = -1, .name = "sub", .mode = {REG16, R_M16, END}, .exec = &sub},
-	{.opcode = 0x2C, .extended = -1, .name = "sub", .mode = {OPREG8, IMM8, END}, .exec = &sub},
-	{.opcode = 0x2D, .extended = -1, .name = "sub", .mode = {OPREG16, IMM16, END}, .exec = &sub},
+	{.opcode = 0x2C, .extended = -1, .name = "sub", .mode = {ACC8, IMM8, END}, .exec = &sub},
+	{.opcode = 0x2D, .extended = -1, .name = "sub", .mode = {ACC16, IMM16, END}, .exec = &sub},
 
 	{.opcode = 0x2F, .extended = -1, .name = "das", .mode = {END}, .exec = NULL},
 	{.opcode = 0x30, .extended = -1, .name = "xor", .mode = {R_M8, REG8, END}, .exec = &xor_inst},
