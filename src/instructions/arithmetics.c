@@ -29,11 +29,29 @@ void sub(const instruction_t *self, state_t *state)
 
 	write_op(from, value);
 
-	state->of = value != read_op(from);
+	// FIXME: value != read_op(from);
+	state->of = false;
 	state->cf = old < minus;
 	state->sf = value & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
 	state->zf = value == 0;
 	// TODO: Set AF and PF
+}
+
+void div(const instruction_t *self, state_t *state)
+{
+	operand_t to = get_operand(self, 0, state);
+	unsigned old;
+	unsigned minus = read_op(to);
+
+	if (is_operand_wide(self, 0)) {
+		old = (state->dx << 16) | state->ax;
+		state->ax = old / minus;
+		state->dx = old % minus;
+	} else {
+		old = state->ax;
+		state->al = old / minus;
+		state->ah = old % minus;
+	}
 }
 
 void and_inst(const instruction_t *self, state_t *state)
@@ -155,6 +173,12 @@ void cbw(const instruction_t *self, state_t *state)
 	state->ah = state->al >> 0x7 & 1 ? 0xFF : 0;
 }
 
+void cwd(const instruction_t *self, state_t *state)
+{
+	(void)self;
+	state->dx = state->ah >> 0x7 & 1 ? 0xFFFF : 0;
+}
+
 void neg(const instruction_t *self, state_t *state)
 {
 	operand_t from = get_operand(self, 0, state);
@@ -180,4 +204,14 @@ void shl(const instruction_t *self, state_t *state)
 	state->cf = value >> (8 - shft);
 	state->sf = new & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
 	state->zf = new == 0;
+}
+
+void xchg(const instruction_t *self, state_t *state)
+{
+	operand_t from = get_operand(self, 0, state);
+	operand_t to = get_operand(self, 1, state);
+
+	unsigned tmp = read_op(from);
+	write_op(from, read_op(to));
+	write_op(to, tmp);
 }

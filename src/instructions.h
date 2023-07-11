@@ -32,6 +32,7 @@ void lea(const instruction_t *self, state_t *state);
 
 void add(const instruction_t *self, state_t *state);
 void sub(const instruction_t *self, state_t *state);
+void div(const instruction_t *self, state_t *state);
 void and_inst(const instruction_t *self, state_t *state);
 void or_inst(const instruction_t *self, state_t *state);
 void xor_inst(const instruction_t *self, state_t *state);
@@ -40,5 +41,7 @@ void test(const instruction_t *self, state_t *state);
 void inc(const instruction_t *self, state_t *state);
 void dec(const instruction_t *self, state_t *state);
 void cbw(const instruction_t *self, state_t *state);
+void cwd(const instruction_t *self, state_t *state);
 void neg(const instruction_t *self, state_t *state);
 void shl(const instruction_t *self, state_t *state);
+void xchg(const instruction_t *self, state_t *state);
