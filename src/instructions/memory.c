@@ -229,6 +229,22 @@ void int_inst(const instruction_t *self, state_t *state)
 		syscall->type = ret;
 		break;
 	}
+	case 0x11: {
+		uint16_t addr = *((uint16_t *)args + 3);
+		if (state->parse_data.debug)
+			printf("<brk(0x%04x)", addr);
+		uint16_t ret;
+		if (addr < state->data_size || (addr >= ((state->sp & ~0x3ff) - 0x400))) {
+			ret = -ENOMEM;
+			printf(" => ENOMEM>\n");
+		} else {
+			ret = 0;
+			printf(" => 0>\n");
+		}
+		*((uint16_t *)args + 7) = addr;
+		syscall->type = ret;
+		break;
+	}
 	case 0x36: {
 		uint16_t fd = *(uint16_t *)args;
 		uint16_t addr = *((uint16_t *)args + 2);

@@ -154,3 +154,15 @@ void cbw(const instruction_t *self, state_t *state)
 	(void)self;
 	state->ah = state->al >> 0x7 & 1 ? 0xFF : 0;
 }
+
+void neg(const instruction_t *self, state_t *state)
+{
+	operand_t from = get_operand(self, 0, state);
+	unsigned value = -read_op(from);
+
+	write_op(from, value);
+
+	state->cf = value != 0;
+	state->sf = value & (is_operand_wide(self, 0) ? 0x8000 : 0x80);
+	state->zf = value == 0;
+}

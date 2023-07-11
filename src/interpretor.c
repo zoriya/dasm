@@ -76,8 +76,11 @@ operand_t get_rm_operand(state_t *state, unsigned *imm_idx, bool is16bit)
 	if (mod == 0 && rm == 0b110) {
 		*imm_idx += 2;
 		return (operand_t){
-			.ptr = state->memory + state->binary[state->pc + state->parse_data.imm_idx],
-			.type = is16bit ? BIT16 : BIT8
+			.ptr = state->memory + ((
+				state->binary[state->pc + state->parse_data.imm_idx + 1] << 8)
+				| state->binary[state->pc + state->parse_data.imm_idx]
+			),
+			.type = BIT16
 		};
 	}
 	if (mod == 0b10) {
@@ -311,6 +314,7 @@ int interpret(u_int8_t *binary, unsigned long size, int argc, char **argv, bool 
 	binary += header_size;
 	state->binary = binary;
 	state->binary_size = size;
+	state->data_size = dsize;
 	state->parse_data.debug = debug_mode;
 
 	memcpy(state->memory, binary + size, dsize);

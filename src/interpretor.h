@@ -58,6 +58,7 @@ typedef struct state {
 
 	uint8_t *binary;
 	unsigned binary_size;
+	unsigned data_size;
 
 	uint8_t memory[MEMORY_SIZE];
 
