@@ -42,6 +42,10 @@ typedef enum addressing_mode {
 	REL8,
 	// Like IMM16 but for relative jumps
 	REL16,
+	// AL
+	ACC8,
+	// AX
+	ACC16,
 	// Special item just to mark the end
 	END,
 } addressing_mode_t;

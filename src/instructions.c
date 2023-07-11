@@ -84,8 +84,8 @@ const instruction_t instructions[] = {
 	{.opcode = 0x39, .extended = -1, .name = "cmp", .mode = {R_M16, REG16, END}, .exec = &cmp},
 	{.opcode = 0x3A, .extended = -1, .name = "cmp", .mode = {REG8, R_M8, END}, .exec = &cmp},
 	{.opcode = 0x3B, .extended = -1, .name = "cmp", .mode = {REG16, R_M16, END}, .exec = &cmp},
-	{.opcode = 0x3C, .extended = -1, .name = "cmp", .mode = {OPREG8, IMM8, END}, .exec = &cmp},
-	{.opcode = 0x3D, .extended = -1, .name = "cmp", .mode = {OPREG16, IMM16, END}, .exec = &cmp},
+	{.opcode = 0x3C, .extended = -1, .name = "cmp", .mode = {ACC8, IMM8, END}, .exec = &cmp},
+	{.opcode = 0x3D, .extended = -1, .name = "cmp", .mode = {ACC16, IMM16, END}, .exec = &cmp},
 
 	{.opcode = 0x3F, .extended = -1, .name = "ass", .mode = {END}, .exec = NULL},
 	{.opcode = 0x40, .extended = -1, .name = "inc", .mode = {OPREG16, END}, .exec = &inc},

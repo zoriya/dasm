@@ -170,6 +170,12 @@ operand_t get_operand(const instruction_t *inst, unsigned i, state_t *state)
 	case OPREG16:
 		ret = get_reg_operand(state, true, state->binary[state->pc] & 0b111);
 		break;
+	case ACC8:
+		ret = get_reg_operand(state, false, 0);
+		break;
+	case ACC16:
+		ret = get_reg_operand(state, true, 0);
+		break;
 	case R_M8:
 		ret = get_rm_operand(state, &imm_idx, false);
 		break;
@@ -177,7 +183,7 @@ operand_t get_operand(const instruction_t *inst, unsigned i, state_t *state)
 		ret = get_rm_operand(state, &imm_idx, true);
 		break;
 	case END:
-		printf("Invalid parameter read.");
+		printf("Invalid parameter read (param %d).\n", i);
 		break;
 	}
 	state->parse_data.imm_idx += imm_idx;
@@ -198,6 +204,8 @@ bool is_operand_wide(const instruction_t *inst, unsigned i)
 	case R_M16:
 	case IMM16:
 	case REL16:
+	case ACC8:
+	case ACC16:
 	case END:
 		return true;
 	}

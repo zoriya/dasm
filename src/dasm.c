@@ -77,6 +77,8 @@ bool has_reg(const instruction_t *inst)
 		case IMM16:
 		case REL8:
 		case REL16:
+		case ACC8:
+		case ACC16:
 		case END:
 			continue;
 		}
@@ -139,6 +141,12 @@ void print_instruction(unsigned addr, instruction_t inst, unsigned inst_size, u_
 			printf("%04x", addr + inst_size + (int16_t)((binary[imm_idx + 1] << 8) | binary[imm_idx]));
 			imm_idx += 2;
 			break;
+		case ACC8:
+			printf("al");
+			break;
+		case ACC16:
+			printf("ax");
+			break;
 		case REG8:
 			printf("%s", registers8[(binary[1] & 0b111000) >> 3]);
 			break;
@@ -200,6 +208,8 @@ unsigned get_inst_size(instruction_t inst, u_int8_t *binary, unsigned bin_size)
 			break;
 		case OPREG8:
 		case OPREG16:
+		case ACC8:
+		case ACC16:
 		case END:
 			break;
 		}
